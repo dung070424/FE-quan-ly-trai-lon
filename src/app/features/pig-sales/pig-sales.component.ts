@@ -1,23 +1,40 @@
 import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { FormBuilder, FormGroup, ReactiveFormsModule, FormsModule, Validators } from '@angular/forms';
 import { PigSaleService, PigSale } from './pig-sale.service';
 
 @Component({
     selector: 'app-pig-sales',
     standalone: true,
-    imports: [CommonModule, ReactiveFormsModule],
+    imports: [CommonModule, ReactiveFormsModule, FormsModule],
     templateUrl: './pig-sales.component.html',
     styleUrl: './pig-sales.component.scss'
 })
 export class PigSalesComponent implements OnInit {
     salesData: PigSale[] = [];
-    totalAmount: number = 0;
+    searchTerm: string = '';
+
+    get filteredSalesData(): PigSale[] {
+        if (!this.searchTerm.trim()) {
+            return this.salesData;
+        }
+        const term = this.searchTerm.toLowerCase().trim();
+        return this.salesData.filter(sale =>
+            sale.customer?.toLowerCase().includes(term)
+        );
+    }
+
+    get totalAmount(): number {
+        return this.filteredSalesData.reduce((sum, sale) => sum + Number(sale.total), 0);
+    }
 
     isModalOpen = false;
     isEditing = false;
     currentSaleId: number | null = null;
     saleForm: FormGroup;
+
+    isDeleteModalOpen = false;
+    itemToDelete: number | null = null;
 
     constructor(
         private pigSaleService: PigSaleService,
@@ -42,17 +59,12 @@ export class PigSalesComponent implements OnInit {
             next: (data) => {
                 // Sắp xếp dữ liệu mới nhất lên đầu (dựa vào id giảm dần)
                 this.salesData = [...data].sort((a, b) => (b.id || 0) - (a.id || 0));
-                this.calculateTotal();
                 this.cdr.detectChanges(); // Force UI to update immediately
             },
             error: (err) => {
                 console.error('Error fetching sales data', err);
             }
         });
-    }
-
-    calculateTotal(): void {
-        this.totalAmount = this.salesData.reduce((sum, sale) => sum + Number(sale.total), 0);
     }
 
     openModal(sale?: PigSale): void {
@@ -108,7 +120,6 @@ export class PigSalesComponent implements OnInit {
                     }
                     // Sort again just in case
                     this.salesData = [...this.salesData].sort((a, b) => (b.id || 0) - (a.id || 0));
-                    this.calculateTotal();
                     this.closeModal();
                 },
                 error: (err) => console.error('Error updating sale', err)
@@ -117,7 +128,6 @@ export class PigSalesComponent implements OnInit {
             this.pigSaleService.createPigSale(payload).subscribe({
                 next: (newSale) => {
                     this.salesData = [newSale, ...this.salesData].sort((a, b) => (b.id || 0) - (a.id || 0));
-                    this.calculateTotal();
                     this.closeModal();
                 },
                 error: (err) => console.error('Error creating sale', err)
@@ -127,15 +137,30 @@ export class PigSalesComponent implements OnInit {
 
     deleteSale(id: number | undefined): void {
         if (!id) return;
-        if (confirm('Bạn có chắc chắn muốn xóa lượt bán này không?')) {
-            this.pigSaleService.deletePigSale(id).subscribe({
-                next: () => {
-                    this.salesData = this.salesData.filter(s => s.id !== id);
-                    this.calculateTotal();
-                    this.cdr.detectChanges(); // Force UI to update
-                },
-                error: (err) => console.error('Error deleting sale', err)
-            });
-        }
+        this.itemToDelete = id;
+        this.isDeleteModalOpen = true;
+    }
+
+    confirmDelete(): void {
+        if (!this.itemToDelete) return;
+
+        this.pigSaleService.deletePigSale(this.itemToDelete).subscribe({
+            next: () => {
+                this.salesData = this.salesData.filter(s => s.id !== this.itemToDelete);
+                this.isDeleteModalOpen = false;
+                this.itemToDelete = null;
+                this.cdr.detectChanges(); // Force UI to update
+            },
+            error: (err) => {
+                console.error('Error deleting sale', err);
+                this.isDeleteModalOpen = false;
+                this.itemToDelete = null;
+            }
+        });
+    }
+
+    cancelDelete(): void {
+        this.isDeleteModalOpen = false;
+        this.itemToDelete = null;
     }
 }
