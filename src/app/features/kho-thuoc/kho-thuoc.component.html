@@ -1,0 +1,266 @@
+<div class="page-container">
+    <div class="page-header">
+        <h1 class="page-title">Quản lý kho thuốc</h1>
+    </div>
+
+    <!-- Dashboard Stats -->
+    <div class="stats-grid">
+        <div class="stat-card blue">
+            <div class="stat-value">{{ totalMedicinesCount }}</div>
+            <div class="stat-label">Tổng số thuốc</div>
+        </div>
+        <div class="stat-card orange">
+            <div class="stat-value">{{ almostOutOfStockCount }}</div>
+            <div class="stat-label">Sắp hết hàng</div>
+        </div>
+        <div class="stat-card red">
+            <div class="stat-value">{{ almostExpiredCount }}</div>
+            <div class="stat-label">Sắp hết hạn</div>
+        </div>
+        <div class="stat-card dark-red">
+            <div class="stat-value">{{ expiredCount }}</div>
+            <div class="stat-label">Đã hết hạn</div>
+        </div>
+        <div class="stat-card green bg-soft-green">
+            <div class="stat-value text-green">{{ formatCurrency(totalValue) }}</div>
+            <div class="stat-label">Tổng giá trị</div>
+        </div>
+    </div>
+
+    <div class="view-toolbar">
+        <h2 class="section-title">Danh sách thuốc trong kho</h2>
+
+        <div class="search-box">
+            <input type="text" placeholder="Tìm kiếm tên, loại..." [(ngModel)]="searchTerm" class="search-input" />
+        </div>
+
+        <div class="action-buttons">
+            <button class="btn btn-warning" (click)="openImportModal()">
+                <span>+</span> Nhập kho
+            </button>
+            <button class="btn btn-danger" (click)="openHistoryModal()">
+                <span>📋</span> Lịch sử nhập
+            </button>
+            <button class="btn btn-success" (click)="loadInventories()">
+                <span>↺</span> Làm mới
+            </button>
+        </div>
+    </div>
+
+    <!-- Inventory Grid -->
+    <div class="inventory-grid">
+        @for (inv of filteredInventories; track inv.id) {
+        <div class="inventory-card">
+            <div class="card-header">
+                <h3 class="medicine-name">{{ inv.medicineName }}</h3>
+                <div class="badges">
+                    <span class="badge status-normal" *ngIf="inv.quantity > (inv.minQuantity || 0)">Bình thường</span>
+                    <span class="badge status-warning" *ngIf="inv.quantity <= (inv.minQuantity || 0)">Sắp hết
+                        hàng</span>
+
+                    <span class="badge status-expired" *ngIf="getExpiryStatus(inv.expiryDate) === 'expired'">Hết
+                        hạn</span>
+                    <span class="badge status-warning" *ngIf="getExpiryStatus(inv.expiryDate) === 'almost'">Sắp hết
+                        hạn</span>
+                </div>
+            </div>
+
+            <div class="card-body">
+                <div class="info-row">
+                    <span class="info-label">Loại:</span>
+                    <span class="info-value font-medium">{{ inv.type }}</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">Số lượng:</span>
+                    <span class="info-value text-blue fw-bold">{{ inv.quantity }} {{ inv.unit }}</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">Tối thiểu:</span>
+                    <span class="info-value">{{ inv.minQuantity }} {{ inv.unit }}</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">Tối đa:</span>
+                    <span class="info-value">{{ inv.maxQuantity }} {{ inv.unit }}</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">Giá trị:</span>
+                    <span class="info-value text-green fw-bold">{{ formatCurrency((inv.unitPrice || 0) * inv.quantity)
+                        }}</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">Hết hạn:</span>
+                    <span class="info-value">{{ inv.expiryDate | date:'dd/MM/yyyy' }}</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">Vị trí:</span>
+                    <span class="info-value">{{ inv.location }}</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">Cập nhật:</span>
+                    <span class="info-value">{{ inv.lastUpdated | date:'dd/MM/yyyy' }}</span>
+                </div>
+            </div>
+
+            <div class="card-footer">
+                <div class="progress-bar-container">
+                    <div class="progress-bar" [style.width.%]="getProgressPercentage(inv.quantity, inv.maxQuantity)"
+                        [class.bg-green]="getProgressPercentage(inv.quantity, inv.maxQuantity) > 20"
+                        [class.bg-red]="getProgressPercentage(inv.quantity, inv.maxQuantity) <= 20">
+                    </div>
+                </div>
+                <div class="card-actions">
+                    <button class="btn btn-sm btn-outline-danger" (click)="openExportModal(inv)">Xuất kho</button>
+                </div>
+            </div>
+        </div>
+        } @empty {
+        <div class="empty-state">Không có thuốc nào trong kho.</div>
+        }
+    </div>
+</div>
+
+<!-- Import Modal -->
+<div class="modal-overlay" *ngIf="isImportModalOpen">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2>Nhập kho thuốc</h2>
+            <button class="close-btn" (click)="closeImportModal()">×</button>
+        </div>
+        <div class="modal-body">
+            <form [formGroup]="importForm" (ngSubmit)="saveImport()">
+                <div class="form-group">
+                    <label>Tên Thuốc (Lấy từ Danh mục) <span class="required">*</span></label>
+                    <select formControlName="medicineId" class="form-control"
+                        [class.is-invalid]="importForm.get('medicineId')?.invalid && importForm.get('medicineId')?.touched">
+                        <option value="">-- Chọn thuốc --</option>
+                        <option *ngFor="let m of medicines" [value]="m.id">{{ m.name }} ({{ m.medicineCode }})</option>
+                    </select>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Loại <span class="required">*</span></label>
+                        <input type="text" formControlName="type" class="form-control" />
+                    </div>
+                    <div class="form-group">
+                        <label>Số lượng Nhập <span class="required">*</span></label>
+                        <input type="number" formControlName="quantity" class="form-control" />
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Đơn vị tính <span class="required">*</span></label>
+                        <input type="text" formControlName="unit" class="form-control" />
+                    </div>
+                    <div class="form-group">
+                        <label>Đơn giá / đơn vị <span class="required">*</span></label>
+                        <input type="number" formControlName="unitPrice" class="form-control" />
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Min Qty <span class="required">*</span></label>
+                        <input type="number" formControlName="minQuantity" class="form-control" />
+                    </div>
+                    <div class="form-group">
+                        <label>Max Qty <span class="required">*</span></label>
+                        <input type="number" formControlName="maxQuantity" class="form-control" />
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>Vị trí trong kho <span class="required">*</span></label>
+                    <input type="text" formControlName="location" class="form-control" placeholder="Kệ A1..." />
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" (click)="closeImportModal()">Hủy</button>
+                    <button type="submit" class="btn btn-warning" [disabled]="importForm.invalid">Nhập Kho</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Export Modal -->
+<div class="modal-overlay" *ngIf="isExportModalOpen">
+    <div class="modal-content modal-sm">
+        <div class="modal-header">
+            <h2>Xuất kho: {{ currentExportInventory?.medicineName }}</h2>
+            <button class="close-btn" (click)="closeExportModal()">×</button>
+        </div>
+        <div class="modal-body">
+            <p>Trong kho hiện còn <strong>{{ currentExportInventory?.quantity }}</strong> {{
+                currentExportInventory?.unit }}</p>
+            <form [formGroup]="exportForm" (ngSubmit)="saveExport()">
+                <div class="form-group">
+                    <label>Số lượng xuất <span class="required">*</span></label>
+                    <input type="number" formControlName="amount" class="form-control"
+                        [class.is-invalid]="exportForm.get('amount')?.invalid && exportForm.get('amount')?.touched" />
+                    <div *ngIf="exportForm.get('amount')?.hasError('max')" class="invalid-feedback">
+                        Không thể xuất lớn hơn Tồn kho.
+                    </div>
+                    <div *ngIf="exportForm.get('amount')?.hasError('min')" class="invalid-feedback">
+                        Phải xuất ít nhất 1.
+                    </div>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" (click)="closeExportModal()">Hủy</button>
+                    <button type="submit" class="btn btn-danger" [disabled]="exportForm.invalid">Xuất Kho</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- History Modal -->
+<div class="modal-overlay" *ngIf="isHistoryModalOpen">
+    <div class="modal-content" style="max-width: 800px;">
+        <div class="modal-header">
+            <h2>Lịch sử nhập thuốc</h2>
+            <button class="close-btn" (click)="closeHistoryModal()">×</button>
+        </div>
+        <div class="modal-body">
+            <div class="table-container" style="max-height: 400px; overflow-y: auto;">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Thời gian</th>
+                            <th>Tên thuốc</th>
+                            <th>Số lượng</th>
+                            <th>Đơn giá</th>
+                            <th>Thành tiền</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr *ngFor="let h of importHistory">
+                            <td>{{ h.importDate | date:'dd/MM/yyyy HH:mm' }}</td>
+                            <td>{{ h.medicineName }}</td>
+                            <td class="text-blue fw-bold">{{ h.quantity }} {{ h.unit }}</td>
+                            <td>{{ formatCurrency(h.unitPrice || 0) }}</td>
+                            <td class="text-green fw-bold">{{ formatCurrency(h.totalPrice || 0) }}</td>
+                        </tr>
+                        <tr *ngIf="importHistory.length === 0">
+                            <td colspan="5" class="empty-message">Chưa có dữ liệu lịch sử nhập kho.</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="card-footer" style="background: transparent; justify-content: flex-end; padding-top: 16px;">
+                <div class="total-summary" style="display: flex; gap: 12px; align-items: baseline;">
+                    <span class="total-label">Tổng tiền các lần nhập:</span>
+                    <span class="total-value text-green" style="font-size: 1.5rem;">{{ formatCurrency(totalImportCost)
+                        }}</span>
+                </div>
+            </div>
+
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" (click)="closeHistoryModal()">Đóng</button>
+            </div>
+        </div>
+    </div>
+</div>
