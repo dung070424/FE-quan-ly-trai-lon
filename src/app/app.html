@@ -1,0 +1,9 @@
+<div class="app-layout" [class.sidebar-closed]="!sidebarOpen()">
+  <app-header class="app-header-container" (menuClick)="toggleSidebar()"></app-header>
+  <div class="app-body">
+    <app-sidebar class="app-sidebar-container"></app-sidebar>
+    <main class="app-main">
+      <app-pig-sales></app-pig-sales>
+    </main>
+  </div>
+</div>

@@ -1,0 +1,29 @@
+<aside class="app-sidebar">
+    <div class="sidebar-header">
+        <div class="farm-logo-container">
+            <img src="https://api.dicebear.com/9.x/fun-emoji/svg?seed=pig&backgroundColor=ffd5dc" alt="Pig Logo"
+                class="farm-logo" />
+        </div>
+        <div class="farm-name">Trại Lợn XYZ</div>
+    </div>
+
+    <nav class="sidebar-nav">
+        <ul>
+            @for (item of menuItems; track item.label) {
+            <li [class.active]="item.active">
+                <a href="#" (click)="$event.preventDefault()">
+                    <svg class="nav-icon" viewBox="0 0 24 24" fill="currentColor">
+                        <path [attr.d]="item.icon"></path>
+                    </svg>
+                    <span class="nav-label">{{ item.label }}</span>
+                </a>
+            </li>
+            }
+        </ul>
+    </nav>
+
+    <div class="sidebar-footer">
+        <p>© 2023 Quản Lý Trại Lợn</p>
+        <p>Phiên bản 1.0.0</p>
+    </div>
+</aside>

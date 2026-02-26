@@ -1,0 +1,121 @@
+<div class="page-container">
+    <h1 class="page-title">Quản lý Bán Lợn</h1>
+
+    <div class="content-card">
+        <div class="card-toolbar">
+            <div class="search-box">
+                <div class="search-input-wrapper">
+                    <svg class="search-icon" width="16" height="16" viewBox="0 0 24 24" fill="none"
+                        stroke="currentColor" stroke-width="2">
+                        <circle cx="11" cy="11" r="8"></circle>
+                        <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                    </svg>
+                    <input type="text" placeholder="Tìm kiếm theo mã, khách hàng..." class="search-input" />
+                </div>
+            </div>
+            <button class="btn btn-primary" (click)="openModal()">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M12 5v14M5 12h14" />
+                </svg>
+                Thêm Lượt Bán Mới
+            </button>
+        </div>
+
+        <div class="table-container">
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>STT</th>
+                        <th>Ngày Bán</th>
+                        <th>Số Lượng (con)</th>
+                        <th>Trọng Lượng (kg)</th>
+                        <th>Giá/Kg (VNĐ)</th>
+                        <th>Tổng Tiền (VNĐ)</th>
+                        <th>Tên Khách Hàng</th>
+                        <th>Hành Động</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @for (sale of salesData; track sale.id; let i = $index) {
+                    <tr>
+                        <td>{{ i + 1 }}</td>
+                        <td>{{ sale.saleDate }}</td>
+                        <td>{{ sale.quantity }}</td>
+                        <td>{{ sale.weight }}</td>
+                        <td>{{ sale.price | number }}</td>
+                        <td>₫{{ sale.total | number }}</td>
+                        <td>{{ sale.customer }}</td>
+                        <td class="actions">
+                            <button class="action-btn edit" title="Sửa" (click)="openModal(sale)">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                    stroke-width="2">
+                                    <path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z" />
+                                </svg>
+                            </button>
+                            <button class="action-btn delete" title="Xóa" (click)="deleteSale(sale.id)">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                    stroke-width="2">
+                                    <path
+                                        d="M3 6h18M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2M10 11v6M14 11v6" />
+                                </svg>
+                            </button>
+                        </td>
+                    </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+
+        <div class="card-footer">
+            <span class="total-label">Tổng tiền bán lợn: </span>
+            <span class="total-value">₫{{ totalAmount | number }}</span>
+        </div>
+    </div>
+</div>
+
+<!-- Modal -->
+<div class="modal-overlay" *ngIf="isModalOpen">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2>{{ isEditing ? 'Cập Nhật Lượt Bán Lợn' : 'Thêm Lượt Bán Mới' }}</h2>
+            <button class="close-btn" (click)="closeModal()">×</button>
+        </div>
+        <div class="modal-body">
+            <form [formGroup]="saleForm" (ngSubmit)="saveSale()">
+                <div class="form-group">
+                    <label for="saleDate">Ngày Bán <span class="required">*</span></label>
+                    <input type="date" id="saleDate" formControlName="saleDate" class="form-control" />
+                </div>
+                
+                <div class="form-group">
+                    <label for="customer">Tên Khách Hàng <span class="required">*</span></label>
+                    <input type="text" id="customer" formControlName="customer" class="form-control" placeholder="Nhập tên khách hàng" />
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="quantity">Số Lượng (con) <span class="required">*</span></label>
+                        <input type="number" id="quantity" formControlName="quantity" class="form-control" min="1" placeholder="0" />
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="weight">Trọng Lượng (kg) <span class="required">*</span></label>
+                        <input type="number" id="weight" formControlName="weight" class="form-control" min="0.1" step="0.1" placeholder="0.0" />
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="price">Giá/Kg (VNĐ) <span class="required">*</span></label>
+                    <input type="number" id="price" formControlName="price" class="form-control" min="0" placeholder="0" />
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" (click)="closeModal()">Hủy</button>
+                    <button type="submit" class="btn btn-primary" [disabled]="saleForm.invalid">
+                        {{ isEditing ? 'Cập Nhật' : 'Lưu' }}
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

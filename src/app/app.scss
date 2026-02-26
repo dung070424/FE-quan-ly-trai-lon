@@ -1,0 +1,38 @@
+:host {
+    display: block;
+}
+
+.app-layout {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    overflow: hidden;
+    font-family: 'Inter', 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+}
+
+.app-header-container {
+    flex-shrink: 0;
+    z-index: 10;
+}
+
+.app-body {
+    display: flex;
+    flex: 1;
+    overflow: hidden;
+}
+
+.app-sidebar-container {
+    flex-shrink: 0;
+    z-index: 5;
+    transition: margin-left 0.3s ease;
+}
+
+.app-layout.sidebar-closed .app-sidebar-container {
+    margin-left: -260px;
+}
+
+.app-main {
+    flex: 1;
+    overflow-y: auto;
+    background-color: #f8fafb;
+}
