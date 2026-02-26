@@ -24,7 +24,8 @@ export class NhanVienComponent implements OnInit {
         return this.employeesData.filter(employee =>
             employee.name?.toLowerCase().includes(term) ||
             employee.employeeCode?.toLowerCase().includes(term) ||
-            employee.identityCard?.includes(term)
+            employee.identityCard?.includes(term) ||
+            employee.phoneNumber?.includes(term)
         );
     }
 
@@ -62,10 +63,11 @@ export class NhanVienComponent implements OnInit {
     ) {
         this.employeeForm = this.fb.group({
             name: ['', Validators.required],
-            dateOfBirth: [''],
-            identityCard: ['', Validators.pattern('^[0-9]*$')],
-            gender: ['Nam'],
-            address: ['']
+            dateOfBirth: ['', Validators.required],
+            phoneNumber: ['', [Validators.required, Validators.pattern('^[0-9]{10,11}$')]],
+            identityCard: ['', [Validators.required, Validators.pattern('^[0-9]{9,12}$')]],
+            gender: ['Nam', Validators.required],
+            address: ['', Validators.required]
         });
     }
 
@@ -98,6 +100,7 @@ export class NhanVienComponent implements OnInit {
             this.employeeForm.patchValue({
                 name: employee.name,
                 dateOfBirth: dobValue || '',
+                phoneNumber: employee.phoneNumber || '',
                 identityCard: employee.identityCard || '',
                 gender: employee.gender || 'Nam',
                 address: employee.address || ''

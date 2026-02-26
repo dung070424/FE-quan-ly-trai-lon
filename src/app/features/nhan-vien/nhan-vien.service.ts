@@ -10,6 +10,7 @@ export interface Employee {
     identityCard?: string;
     address?: string;
     gender?: string;
+    phoneNumber?: string;
 }
 
 @Injectable({

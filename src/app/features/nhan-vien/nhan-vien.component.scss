@@ -431,6 +431,20 @@
     &::placeholder {
         color: #94a3b8;
     }
+
+    &.is-invalid {
+        border-color: #dc2626;
+
+        &:focus {
+            box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.1);
+        }
+    }
+}
+
+.invalid-feedback {
+    color: #dc2626;
+    font-size: 0.85rem;
+    margin-top: 6px;
 }
 
 .modal-footer {

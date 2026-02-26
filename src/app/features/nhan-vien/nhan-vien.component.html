@@ -30,6 +30,7 @@
                         <th>Mã NV</th>
                         <th>Tên Nhân Viên</th>
                         <th>Ngày Sinh</th>
+                        <th>Số Điện Thoại</th>
                         <th>CCCD</th>
                         <th>Giới Tính</th>
                         <th>Địa Chỉ</th>
@@ -43,6 +44,7 @@
                         <td>{{ employee.employeeCode }}</td>
                         <td>{{ employee.name }}</td>
                         <td>{{ employee.dateOfBirth }}</td>
+                        <td>{{ employee.phoneNumber }}</td>
                         <td>{{ employee.identityCard }}</td>
                         <td>{{ employee.gender }}</td>
                         <td class="note-cell" [title]="employee.address || ''">{{ employee.address }}</td>
@@ -64,7 +66,7 @@
                     </tr>
                     } @empty {
                     <tr>
-                        <td colspan="8" class="empty-message">Không có dữ liệu</td>
+                        <td colspan="9" class="empty-message">Không có dữ liệu</td>
                     </tr>
                     }
                 </tbody>
@@ -110,17 +112,57 @@
                 <div class="form-group">
                     <label for="name">Tên Nhân Viên <span class="required">*</span></label>
                     <input type="text" id="name" formControlName="name" class="form-control"
+                        [class.is-invalid]="employeeForm.get('name')?.invalid && employeeForm.get('name')?.touched"
                         placeholder="Nhập tên nhân viên" />
+                    <div *ngIf="employeeForm.get('name')?.invalid && employeeForm.get('name')?.touched"
+                        class="invalid-feedback">
+                        Vui lòng nhập tên nhân viên.
+                    </div>
                 </div>
 
                 <div class="form-row">
                     <div class="form-group">
-                        <label for="dateOfBirth">Ngày Sinh</label>
-                        <input type="date" id="dateOfBirth" formControlName="dateOfBirth" class="form-control" />
+                        <label for="dateOfBirth">Ngày Sinh <span class="required">*</span></label>
+                        <input type="date" id="dateOfBirth" formControlName="dateOfBirth" class="form-control"
+                            [class.is-invalid]="employeeForm.get('dateOfBirth')?.invalid && employeeForm.get('dateOfBirth')?.touched" />
+                        <div *ngIf="employeeForm.get('dateOfBirth')?.invalid && employeeForm.get('dateOfBirth')?.touched"
+                            class="invalid-feedback">
+                            Vui lòng chọn ngày sinh.
+                        </div>
                     </div>
 
                     <div class="form-group">
-                        <label for="gender">Giới Tính</label>
+                        <label for="phoneNumber">Số Điện Thoại <span class="required">*</span></label>
+                        <input type="text" id="phoneNumber" formControlName="phoneNumber" class="form-control"
+                            [class.is-invalid]="employeeForm.get('phoneNumber')?.invalid && employeeForm.get('phoneNumber')?.touched"
+                            placeholder="Nhập số ĐT (10-11 số)" />
+                        <div *ngIf="employeeForm.get('phoneNumber')?.invalid && employeeForm.get('phoneNumber')?.touched"
+                            class="invalid-feedback">
+                            <span *ngIf="employeeForm.get('phoneNumber')?.hasError('required')">Vui lòng nhập
+                                SDT.</span>
+                            <span *ngIf="employeeForm.get('phoneNumber')?.hasError('pattern')">Số điện thoại không hợp
+                                lệ (10-11 số).</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="identityCard">CCCD <span class="required">*</span></label>
+                        <input type="text" id="identityCard" formControlName="identityCard" class="form-control"
+                            [class.is-invalid]="employeeForm.get('identityCard')?.invalid && employeeForm.get('identityCard')?.touched"
+                            placeholder="Nhập số CCCD (9-12 số)" />
+                        <div *ngIf="employeeForm.get('identityCard')?.invalid && employeeForm.get('identityCard')?.touched"
+                            class="invalid-feedback">
+                            <span *ngIf="employeeForm.get('identityCard')?.hasError('required')">Vui lòng nhập
+                                CCCD.</span>
+                            <span *ngIf="employeeForm.get('identityCard')?.hasError('pattern')">CCCD không hợp lệ (9-12
+                                số).</span>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="gender">Giới Tính <span class="required">*</span></label>
                         <select id="gender" formControlName="gender" class="form-control">
                             <option value="Nam">Nam</option>
                             <option value="Nữ">Nữ</option>
@@ -130,15 +172,14 @@
                 </div>
 
                 <div class="form-group">
-                    <label for="identityCard">CCCD</label>
-                    <input type="text" id="identityCard" formControlName="identityCard" class="form-control"
-                        placeholder="Nhập số CCCD" />
-                </div>
-
-                <div class="form-group">
-                    <label for="address">Địa Chỉ</label>
+                    <label for="address">Địa Chỉ <span class="required">*</span></label>
                     <textarea id="address" formControlName="address" class="form-control" rows="3"
+                        [class.is-invalid]="employeeForm.get('address')?.invalid && employeeForm.get('address')?.touched"
                         placeholder="Nhập địa chỉ..."></textarea>
+                    <div *ngIf="employeeForm.get('address')?.invalid && employeeForm.get('address')?.touched"
+                        class="invalid-feedback">
+                        Vui lòng nhập địa chỉ.
+                    </div>
                 </div>
 
                 <div class="modal-footer">
