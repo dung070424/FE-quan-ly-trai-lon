@@ -10,8 +10,8 @@
     <nav class="sidebar-nav">
         <ul>
             @for (item of menuItems; track item.label) {
-            <li [class.active]="item.active">
-                <a href="#" (click)="$event.preventDefault()">
+            <li routerLinkActive="active">
+                <a [routerLink]="item.path">
                     <svg class="nav-icon" viewBox="0 0 24 24" fill="currentColor">
                         <path [attr.d]="item.icon"></path>
                     </svg>

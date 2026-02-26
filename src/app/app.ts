@@ -1,12 +1,12 @@
 import { Component, signal } from '@angular/core';
+import { RouterOutlet } from '@angular/router';
 import { HeaderComponent } from './layout/header/header.component';
 import { SidebarComponent } from './layout/sidebar/sidebar.component';
-import { PigSalesComponent } from './features/pig-sales/pig-sales.component';
 
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [HeaderComponent, SidebarComponent, PigSalesComponent],
+  imports: [HeaderComponent, SidebarComponent, RouterOutlet],
   templateUrl: './app.html',
   styleUrl: './app.scss'
 })
