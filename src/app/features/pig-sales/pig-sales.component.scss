@@ -1,11 +1,15 @@
 .page-container {
     padding: 32px 40px;
     background-color: #f4f7f6;
-    /* slightly cooler grey/green tint */
-    min-height: calc(100vh - 56px);
+    height: calc(100vh - 56px);
+    /* subtract header height */
     width: 100%;
     box-sizing: border-box;
     font-family: 'Inter', sans-serif;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    /* Prevent page level scrolling */
 }
 
 .page-title {
@@ -24,6 +28,12 @@
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04), 0 1px 3px rgba(0, 0, 0, 0.02);
     border: 1px solid #eef2f0;
     overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    /* Take up remaining height */
+    min-height: 0;
+    /* Important for flex child with overflow */
     transition: box-shadow 0.3s ease;
 
     &:hover {
@@ -114,6 +124,11 @@
 .table-container {
     width: 100%;
     overflow-x: auto;
+    overflow-y: auto;
+    /* Enable vertical scrolling */
+    flex: 1;
+    /* Allow table to fill available space */
+    min-height: 0;
 }
 
 .data-table {
@@ -138,6 +153,9 @@
         font-size: 0.75rem;
         letter-spacing: 0.05em;
         border-bottom: 2px solid #e2e8f0;
+        position: sticky;
+        top: 0;
+        z-index: 10;
     }
 
     tbody tr {
@@ -203,13 +221,59 @@
 
 .card-footer {
     padding: 18px 24px;
-    text-align: right;
     background-color: #f8faf9;
     border-top: 1px solid #eef2f0;
     display: flex;
     justify-content: flex-end;
+    align-items: center;
+    gap: 12px;
+
+    &.has-pagination {
+        justify-content: space-between;
+    }
+}
+
+.total-summary {
+    display: flex;
     align-items: baseline;
     gap: 12px;
+}
+
+.pagination {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.page-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 6px;
+    border: 1px solid #cbd5e1;
+    background-color: white;
+    border-radius: 6px;
+    color: #475569;
+    cursor: pointer;
+    transition: all 0.2s;
+
+    &:hover:not(:disabled) {
+        background-color: #f1f5f9;
+        color: #1b4332;
+        border-color: #94a3b8;
+    }
+
+    &:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+        background-color: #f8fafc;
+    }
+}
+
+.page-numbers {
+    color: #475569;
+    font-size: 0.95rem;
+    font-weight: 500;
 }
 
 .total-label {

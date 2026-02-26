@@ -11,7 +11,7 @@
                         <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
                     </svg>
                     <input type="text" placeholder="Tìm kiếm theo tên khách hàng..." class="search-input"
-                        [(ngModel)]="searchTerm" />
+                        [(ngModel)]="searchTerm" (ngModelChange)="onSearchChange()" />
                 </div>
             </div>
             <button class="btn btn-primary" (click)="openModal()">
@@ -37,9 +37,9 @@
                     </tr>
                 </thead>
                 <tbody>
-                    @for (sale of filteredSalesData; track sale.id; let i = $index) {
+                    @for (sale of paginatedSalesData; track sale.id; let i = $index) {
                     <tr>
-                        <td>{{ i + 1 }}</td>
+                        <td>{{ (currentPage - 1) * itemsPerPage + i + 1 }}</td>
                         <td>{{ sale.customer }}</td>
                         <td>{{ sale.saleDate }}</td>
                         <td>{{ sale.quantity }}</td>
@@ -72,9 +72,29 @@
             </table>
         </div>
 
-        <div class="card-footer">
-            <span class="total-label">Tổng tiền bán lợn: </span>
-            <span class="total-value">₫{{ totalAmount | number }}</span>
+        <div class="card-footer" [class.has-pagination]="totalPages > 1">
+            <div class="pagination" *ngIf="totalPages > 1">
+                <button class="page-btn" [disabled]="currentPage === 1" (click)="changePage(currentPage - 1)">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                        stroke-linecap="round" stroke-linejoin="round">
+                        <polyline points="15 18 9 12 15 6"></polyline>
+                    </svg>
+                </button>
+                <div class="page-numbers">
+                    <span>Trang {{ currentPage }} / {{ totalPages }}</span>
+                </div>
+                <button class="page-btn" [disabled]="currentPage === totalPages" (click)="changePage(currentPage + 1)">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                        stroke-linecap="round" stroke-linejoin="round">
+                        <polyline points="9 18 15 12 9 6"></polyline>
+                    </svg>
+                </button>
+            </div>
+
+            <div class="total-summary">
+                <span class="total-label">Tổng tiền bán lợn: </span>
+                <span class="total-value">₫{{ totalAmount | number }}</span>
+            </div>
         </div>
     </div>
 </div>

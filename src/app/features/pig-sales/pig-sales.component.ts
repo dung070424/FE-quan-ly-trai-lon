@@ -13,6 +13,8 @@ import { PigSaleService, PigSale } from './pig-sale.service';
 export class PigSalesComponent implements OnInit {
     salesData: PigSale[] = [];
     searchTerm: string = '';
+    currentPage: number = 1;
+    itemsPerPage: number = 10;
 
     get filteredSalesData(): PigSale[] {
         if (!this.searchTerm.trim()) {
@@ -26,6 +28,25 @@ export class PigSalesComponent implements OnInit {
 
     get totalAmount(): number {
         return this.filteredSalesData.reduce((sum, sale) => sum + Number(sale.total), 0);
+    }
+
+    get totalPages(): number {
+        return Math.ceil(this.filteredSalesData.length / this.itemsPerPage) || 1;
+    }
+
+    get paginatedSalesData(): PigSale[] {
+        const startIndex = (this.currentPage - 1) * this.itemsPerPage;
+        return this.filteredSalesData.slice(startIndex, startIndex + this.itemsPerPage);
+    }
+
+    changePage(page: number): void {
+        if (page >= 1 && page <= this.totalPages) {
+            this.currentPage = page;
+        }
+    }
+
+    onSearchChange(): void {
+        this.currentPage = 1;
     }
 
     isModalOpen = false;
@@ -147,6 +168,9 @@ export class PigSalesComponent implements OnInit {
         this.pigSaleService.deletePigSale(this.itemToDelete).subscribe({
             next: () => {
                 this.salesData = this.salesData.filter(s => s.id !== this.itemToDelete);
+                if (this.currentPage > this.totalPages) {
+                    this.currentPage = this.totalPages;
+                }
                 this.isDeleteModalOpen = false;
                 this.itemToDelete = null;
                 this.cdr.detectChanges(); // Force UI to update
