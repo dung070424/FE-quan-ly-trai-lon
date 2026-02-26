@@ -10,6 +10,7 @@ export interface PigSale {
   price: number;
   total: number;
   customer: string;
+  note?: string;
 }
 
 @Injectable({

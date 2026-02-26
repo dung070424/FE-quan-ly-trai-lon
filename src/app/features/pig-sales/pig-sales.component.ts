@@ -67,7 +67,8 @@ export class PigSalesComponent implements OnInit {
             quantity: [null, [Validators.required, Validators.min(1)]],
             weight: [null, [Validators.required, Validators.min(0.1)]],
             price: [null, [Validators.required, Validators.min(0)]],
-            customer: ['', Validators.required]
+            customer: ['', Validators.required],
+            note: ['']
         });
     }
 
@@ -102,7 +103,8 @@ export class PigSalesComponent implements OnInit {
                 quantity: sale.quantity,
                 weight: sale.weight,
                 price: sale.price,
-                customer: sale.customer
+                customer: sale.customer,
+                note: sale.note || ''
             });
         } else {
             this.isEditing = false;

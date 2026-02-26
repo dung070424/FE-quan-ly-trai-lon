@@ -170,6 +170,14 @@
         border-bottom: none;
     }
 
+    .note-cell {
+        max-width: 200px;
+        /* Giới hạn độ dài cột Ghi chú */
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
     .empty-message {
         text-align: center;
         padding: 48px;
