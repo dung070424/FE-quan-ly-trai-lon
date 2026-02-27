@@ -5,9 +5,11 @@ import { ThuocComponent } from './features/thuoc/thuoc.component';
 import { KhoThuocComponent } from './features/kho-thuoc/kho-thuoc.component';
 import { CamComponent } from './features/cam/cam.component';
 import { KhoCamComponent } from './features/kho-cam/kho-cam.component';
+import { TongQuanComponent } from './features/tong-quan/tong-quan';
 
 export const routes: Routes = [
-    { path: '', redirectTo: 'quan-ly-ban-lon', pathMatch: 'full' },
+    { path: '', redirectTo: 'tong-quan', pathMatch: 'full' },
+    { path: 'tong-quan', component: TongQuanComponent },
     { path: 'quan-ly-ban-lon', component: PigSalesComponent },
     { path: 'quan-ly-nhan-vien', component: NhanVienComponent },
     { path: 'quan-ly-thuoc', component: ThuocComponent },
