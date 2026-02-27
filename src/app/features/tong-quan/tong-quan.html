@@ -66,10 +66,43 @@
                 </div>
             </div>
 
+            <div class="card sow-card">
+                <div class="card-icon">
+                    <svg viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M4 6h16v12a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM8 10h8M8 14h8" />
+                    </svg>
+                </div>
+                <div class="card-info">
+                    <h4>Tổng Lợn Nái</h4>
+                    <p class="amount sow">{{ summary.totalSows || 0 }} <small>Con</small></p>
+                </div>
+            </div>
+
+            <div class="card piglet-card">
+                <div class="card-icon">
+                    <svg viewBox="0 0 24 24" fill="currentColor">
+                        <circle cx="12" cy="12" r="10" />
+                        <path d="M8 14s1.5 2 4 2 4-2 4-2" />
+                    </svg>
+                </div>
+                <div class="card-info">
+                    <h4>Lợn Con Sinh Ra</h4>
+                    <p class="amount piglet">{{ summary.totalBornAlive || 0 }} <small>Con</small></p>
+                </div>
+            </div>
+
         </div> <!-- /.summary-cards -->
 
         <!-- Details Grid -->
         <div class="details-grid">
+            <div class="detail-panel chart-panel">
+                <h3>Thống kê Lợn Con Sinh Ra Theo Tháng</h3>
+                <div style="display: block; width: 100%; height: 320px;">
+                    <canvas baseChart [type]="farrowingChartType" [data]="farrowingChartData"
+                        [options]="farrowingChartOptions">
+                    </canvas>
+                </div>
+            </div>
             <div class="detail-panel chart-panel">
                 <h3>Thống kê Số Lượng Lợn Đã Bán</h3>
                 <div style="display: block; width: 100%; height: 320px;">

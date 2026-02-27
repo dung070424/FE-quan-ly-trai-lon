@@ -75,6 +75,16 @@
                     color: #52c41a;
                 }
 
+                &.sow-card .card-icon {
+                    background: #f9f0ff;
+                    color: #722ed1;
+                }
+
+                &.piglet-card .card-icon {
+                    background: #fff7e6;
+                    color: #fa8c16;
+                }
+
                 .card-info {
                     h4 {
                         margin: 0 0 5px 0;
@@ -98,6 +108,14 @@
                         &.neutral {
                             color: #52c41a;
                         }
+
+                        &.sow {
+                            color: #722ed1;
+                        }
+
+                        &.piglet {
+                            color: #fa8c16;
+                        }
                     }
                 }
             }
@@ -105,7 +123,7 @@
 
         .details-grid {
             display: grid;
-            grid-template-columns: 1fr 1fr;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
             gap: 20px;
 
             .detail-panel {

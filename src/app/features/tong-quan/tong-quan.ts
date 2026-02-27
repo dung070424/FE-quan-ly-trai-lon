@@ -48,6 +48,22 @@ export class TongQuanComponent implements OnInit {
   };
   public barChartType: any = 'bar';
 
+  // Farrowing Bar Chart Properties
+  public farrowingChartData: ChartConfiguration<'bar'>['data'] = {
+    labels: [],
+    datasets: [
+      { data: [], label: 'Lợn con sinh ra sống (Con)', backgroundColor: '#fa8c16' }
+    ]
+  };
+  public farrowingChartOptions: ChartOptions<'bar'> = {
+    responsive: true,
+    maintainAspectRatio: false,
+    scales: {
+      y: { beginAtZero: true }
+    }
+  };
+  public farrowingChartType: any = 'bar';
+
   constructor(
     private tongQuanService: TongQuanService,
     private cdr: ChangeDetectorRef
@@ -70,11 +86,12 @@ export class TongQuanComponent implements OnInit {
   }
 
   processChartData(data: DashboardDto) {
-    // Collect all unique months from both sales and expenses
+    // Collect all unique months from both sales, expenses, and farrowing
     const monthsSet = new Set<string>();
     Object.keys(data.salesOverTime || {}).forEach(m => monthsSet.add(m));
     Object.keys(data.expensesOverTime || {}).forEach(m => monthsSet.add(m));
     Object.keys(data.pigsSoldOverTime || {}).forEach(m => monthsSet.add(m));
+    Object.keys(data.pigsBornOverTime || {}).forEach(m => monthsSet.add(m));
 
     // Sort the months chronologically
     const sortedMonths = Array.from(monthsSet).sort();
@@ -91,6 +108,11 @@ export class TongQuanComponent implements OnInit {
     this.barChartData.labels = sortedMonths;
     const pigsSoldData = sortedMonths.map(m => (data.pigsSoldOverTime && data.pigsSoldOverTime[m]) ? data.pigsSoldOverTime[m] : 0);
     this.barChartData.datasets[0].data = pigsSoldData;
+
+    // Prepare arrays for farrowing chart datasets
+    this.farrowingChartData.labels = sortedMonths;
+    const pigsBornData = sortedMonths.map(m => (data.pigsBornOverTime && data.pigsBornOverTime[m]) ? data.pigsBornOverTime[m] : 0);
+    this.farrowingChartData.datasets[0].data = pigsBornData;
   }
 
   formatCurrency(value: number | undefined): string {

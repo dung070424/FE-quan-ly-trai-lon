@@ -8,9 +8,12 @@ export interface DashboardDto {
     totalEmployees: number;
     totalMedicineCost: number;
     totalFeedCost: number;
+    totalSows?: number;
+    totalBornAlive?: number;
     salesOverTime: { [key: string]: number };
     expensesOverTime: { [key: string]: number };
     pigsSoldOverTime: { [key: string]: number };
+    pigsBornOverTime?: { [key: string]: number };
 }
 
 @Injectable({
