@@ -1,3 +1,4 @@
+@if (!isLoginPage) {
 <div class="app-layout" [class.sidebar-closed]="!sidebarOpen()">
   <app-header class="app-header-container" (menuClick)="toggleSidebar()"></app-header>
   <div class="app-body">
@@ -7,3 +8,6 @@
     </main>
   </div>
 </div>
+} @else {
+<router-outlet></router-outlet>
+}

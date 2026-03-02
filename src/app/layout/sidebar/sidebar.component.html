@@ -9,7 +9,7 @@
 
     <nav class="sidebar-nav">
         <ul>
-            @for (item of menuItems; track item.label) {
+            @for (item of filteredMenuItems; track item.label) {
             <li routerLinkActive="active">
                 <a [routerLink]="item.path">
                     <svg class="nav-icon" viewBox="0 0 24 24" fill="currentColor">
@@ -23,6 +23,10 @@
     </nav>
 
     <div class="sidebar-footer">
+        <button class="btn btn-outline-danger w-100 mb-2 py-2 fs-6 fw-bold" style="border-radius: 8px;"
+            (click)="logout()">
+            Đăng xuất
+        </button>
         <p>© 2023 Quản Lý Trại Lợn</p>
         <p>Phiên bản 1.0.0</p>
     </div>
