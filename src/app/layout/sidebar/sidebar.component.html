@@ -10,14 +10,39 @@
     <nav class="sidebar-nav">
         <ul>
             @for (item of filteredMenuItems; track item.label) {
-            <li routerLinkActive="active">
-                <a [routerLink]="item.path">
-                    <svg class="nav-icon" viewBox="0 0 24 24" fill="currentColor">
-                        <path [attr.d]="item.icon"></path>
-                    </svg>
-                    <span class="nav-label">{{ item.label }}</span>
-                </a>
-            </li>
+                @if (item.children) {
+                    <li [class.expanded]="item.expanded">
+                        <a (click)="item.expanded = !item.expanded; $event.preventDefault()" style="cursor: pointer;">
+                            <svg class="nav-icon" viewBox="0 0 24 24" fill="currentColor">
+                                <path [attr.d]="item.icon"></path>
+                            </svg>
+                            <span class="nav-label" style="flex: 1;">{{ item.label }}</span>
+                            <svg class="chevron" [class.rotate]="item.expanded" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M6 9l6 6 6-6"/>
+                            </svg>
+                        </a>
+                        @if (item.expanded) {
+                            <ul class="sub-menu">
+                                @for (child of item.children; track child.label) {
+                                    <li routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}">
+                                        <a [routerLink]="child.path">
+                                            <span class="nav-label">{{ child.label }}</span>
+                                        </a>
+                                    </li>
+                                }
+                            </ul>
+                        }
+                    </li>
+                } @else {
+                    <li routerLinkActive="active">
+                        <a [routerLink]="item.path">
+                            <svg class="nav-icon" viewBox="0 0 24 24" fill="currentColor">
+                                <path [attr.d]="item.icon"></path>
+                            </svg>
+                            <span class="nav-label">{{ item.label }}</span>
+                        </a>
+                    </li>
+                }
             }
         </ul>
     </nav>
