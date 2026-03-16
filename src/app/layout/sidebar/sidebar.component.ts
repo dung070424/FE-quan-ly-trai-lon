@@ -30,8 +30,4 @@ export class SidebarComponent {
         const userRole = this.authService.currentUserValue.role;
         return this.menuItems.filter(item => item.roles.includes(userRole));
     }
-
-    logout() {
-        this.authService.logout();
-    }
 }
