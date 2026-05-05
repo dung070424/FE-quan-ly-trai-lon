@@ -14,6 +14,10 @@ export class HeaderComponent {
 
     isUserMenuOpen = false;
 
+    get currentUser() {
+        return this.authService.currentUserValue;
+    }
+
     toggleUserMenu(event: Event) {
         event.stopPropagation();
         this.isUserMenuOpen = !this.isUserMenuOpen;
