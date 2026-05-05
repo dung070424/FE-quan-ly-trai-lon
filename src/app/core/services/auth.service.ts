@@ -17,12 +17,7 @@ export class AuthService {
     public currentUser$ = this.currentUserSubject.asObservable();
 
     constructor() {
-        if (isPlatformBrowser(this.platformId)) {
-            const storedUser = localStorage.getItem('currentUser');
-            if (storedUser) {
-                this.currentUserSubject.next(JSON.parse(storedUser));
-            }
-        }
+        // Không lưu vào sessionStorage/localStorage để bắt buộc đăng nhập lại khi F5
     }
 
     public get currentUserValue(): any {
@@ -44,9 +39,7 @@ export class AuthService {
             .pipe(
                 tap(user => {
                     if (user && user.token) {
-                        if (isPlatformBrowser(this.platformId)) {
-                            localStorage.setItem('currentUser', JSON.stringify(user));
-                        }
+                        // Chỉ lưu trên biến memory của service
                         this.currentUserSubject.next(user);
                     }
                     return user;
@@ -55,9 +48,6 @@ export class AuthService {
     }
 
     logout() {
-        if (isPlatformBrowser(this.platformId)) {
-            localStorage.removeItem('currentUser');
-        }
         this.currentUserSubject.next(null);
         this.router.navigate(['/login']);
     }

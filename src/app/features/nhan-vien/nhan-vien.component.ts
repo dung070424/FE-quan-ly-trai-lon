@@ -55,6 +55,9 @@ export class NhanVienComponent implements OnInit {
 
     isDeleteModalOpen = false;
     itemToDelete: number | null = null;
+    isSaving = false;
+    
+    imagePreview: string | ArrayBuffer | null = null;
 
     constructor(
         private nhanVienService: NhanVienService,
@@ -67,7 +70,9 @@ export class NhanVienComponent implements OnInit {
             phoneNumber: ['', [Validators.required, Validators.pattern('^[0-9]{10,11}$')]],
             identityCard: ['', [Validators.required, Validators.pattern('^[0-9]{9,12}$')]],
             gender: ['Nam', Validators.required],
-            address: ['', Validators.required]
+            address: ['', Validators.required],
+            email: ['', [Validators.required, Validators.email]],
+            image: ['']
         });
     }
 
@@ -103,12 +108,16 @@ export class NhanVienComponent implements OnInit {
                 phoneNumber: employee.phoneNumber || '',
                 identityCard: employee.identityCard || '',
                 gender: employee.gender || 'Nam',
-                address: employee.address || ''
+                address: employee.address || '',
+                email: employee.email || '',
+                image: employee.image || ''
             });
+            this.imagePreview = employee.image || null;
         } else {
             this.isEditing = false;
             this.currentEmployeeId = null;
             this.employeeForm.reset({ gender: 'Nam' });
+            this.imagePreview = null;
         }
         this.cdr.detectChanges(); // Ensure the modal shows
     }
@@ -116,15 +125,19 @@ export class NhanVienComponent implements OnInit {
     closeModal(): void {
         this.isModalOpen = false;
         this.employeeForm.reset();
+        this.imagePreview = null;
         this.cdr.detectChanges(); // Ensure the modal hides
     }
 
     saveEmployee(): void {
+        if (this.isSaving) return;
+        
         if (this.employeeForm.invalid) {
             this.employeeForm.markAllAsTouched();
             return;
         }
 
+        this.isSaving = true;
         const formValue = this.employeeForm.value;
 
         const payload: Employee = {
@@ -134,23 +147,28 @@ export class NhanVienComponent implements OnInit {
 
         if (this.isEditing && this.currentEmployeeId) {
             this.nhanVienService.updateEmployee(this.currentEmployeeId, payload).subscribe({
-                next: (updatedEmployee) => {
-                    const index = this.employeesData.findIndex(s => s.id === this.currentEmployeeId);
-                    if (index !== -1) {
-                        this.employeesData[index] = updatedEmployee;
-                    }
-                    this.employeesData = [...this.employeesData].sort((a, b) => (b.id || 0) - (a.id || 0));
+                next: () => {
+                    this.loadEmployees();
                     this.closeModal();
+                    this.isSaving = false;
                 },
-                error: (err) => console.error('Error updating employee', err)
+                error: (err) => {
+                    console.error('Error updating employee', err);
+                    this.isSaving = false;
+                }
             });
         } else {
             this.nhanVienService.createEmployee(payload).subscribe({
-                next: (newEmployee) => {
-                    this.employeesData = [newEmployee, ...this.employeesData].sort((a, b) => (b.id || 0) - (a.id || 0));
+                next: () => {
+                    this.loadEmployees();
+                    this.currentPage = 1;
                     this.closeModal();
+                    this.isSaving = false;
                 },
-                error: (err) => console.error('Error creating employee', err)
+                error: (err) => {
+                    console.error('Error creating employee', err);
+                    this.isSaving = false;
+                }
             });
         }
     }
@@ -185,5 +203,19 @@ export class NhanVienComponent implements OnInit {
     cancelDelete(): void {
         this.isDeleteModalOpen = false;
         this.itemToDelete = null;
+    }
+
+    onFileSelected(event: any): void {
+        const file = event.target.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                this.imagePreview = e.target?.result || null;
+                this.employeeForm.patchValue({
+                    image: this.imagePreview
+                });
+            };
+            reader.readAsDataURL(file);
+        }
     }
 }

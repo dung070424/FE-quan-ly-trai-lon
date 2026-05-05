@@ -27,12 +27,14 @@
                 <thead>
                     <tr>
                         <th>STT</th>
+                        <th>Ảnh</th>
                         <th>Mã NV</th>
                         <th>Tên Nhân Viên</th>
                         <th>Ngày Sinh</th>
                         <th>Số Điện Thoại</th>
                         <th>CCCD</th>
                         <th>Giới Tính</th>
+                        <th>Email</th>
                         <th>Địa Chỉ</th>
                         <th>Hành Động</th>
                     </tr>
@@ -41,12 +43,17 @@
                     @for (employee of paginatedEmployeesData; track employee.id; let i = $index) {
                     <tr>
                         <td>{{ (currentPage - 1) * itemsPerPage + i + 1 }}</td>
+                        <td>
+                            <img *ngIf="employee.image" [src]="employee.image" alt="Ảnh NV" width="40" height="40" style="border-radius: 50%; object-fit: cover; border: 1px solid #ddd;">
+                            <div *ngIf="!employee.image" style="width: 40px; height: 40px; border-radius: 50%; background-color: #f0f0f0; display: flex; align-items: center; justify-content: center; font-size: 10px; color: #888; border: 1px solid #ddd;">Trống</div>
+                        </td>
                         <td>{{ employee.employeeCode }}</td>
                         <td>{{ employee.name }}</td>
                         <td>{{ employee.dateOfBirth }}</td>
                         <td>{{ employee.phoneNumber }}</td>
                         <td>{{ employee.identityCard }}</td>
                         <td>{{ employee.gender }}</td>
+                        <td>{{ employee.email }}</td>
                         <td class="note-cell" [title]="employee.address || ''">{{ employee.address }}</td>
                         <td class="actions">
                             <button class="action-btn edit" title="Sửa" (click)="openModal(employee)">
@@ -66,7 +73,7 @@
                     </tr>
                     } @empty {
                     <tr>
-                        <td colspan="9" class="empty-message">Không có dữ liệu</td>
+                        <td colspan="11" class="empty-message">Không có dữ liệu</td>
                     </tr>
                     }
                 </tbody>
@@ -109,6 +116,17 @@
         </div>
         <div class="modal-body">
             <form [formGroup]="employeeForm" (ngSubmit)="saveEmployee()">
+                <div class="form-row" style="justify-content: center; margin-bottom: 20px;">
+                    <div class="form-group" style="display: flex; flex-direction: column; align-items: center;">
+                        <label for="image" style="margin-bottom: 10px;">Ảnh Nhân Viên</label>
+                        <div style="width: 120px; height: 120px; border-radius: 50%; border: 2px dashed #ccc; margin-bottom: 10px; overflow: hidden; display: flex; align-items: center; justify-content: center; background-color: #f8f9fa;">
+                            <img *ngIf="imagePreview" [src]="imagePreview" alt="Preview" style="width: 100%; height: 100%; object-fit: cover;" />
+                            <span *ngIf="!imagePreview" style="color: #aaa; font-size: 14px;">Chọn ảnh</span>
+                        </div>
+                        <input type="file" id="image" accept="image/*" (change)="onFileSelected($event)" style="font-size: 14px; max-width: 250px; cursor: pointer;" />
+                    </div>
+                </div>
+
                 <div class="form-group">
                     <label for="name">Tên Nhân Viên <span class="required">*</span></label>
                     <input type="text" id="name" formControlName="name" class="form-control"
@@ -169,6 +187,18 @@
                             <option value="Khác">Khác</option>
                         </select>
                     </div>
+
+                    <div class="form-group">
+                        <label for="email">Email <span class="required">*</span></label>
+                        <input type="email" id="email" formControlName="email" class="form-control"
+                            [class.is-invalid]="employeeForm.get('email')?.invalid && employeeForm.get('email')?.touched"
+                            placeholder="Nhập địa chỉ email" />
+                        <div *ngIf="employeeForm.get('email')?.invalid && employeeForm.get('email')?.touched"
+                            class="invalid-feedback">
+                            <span *ngIf="employeeForm.get('email')?.hasError('required')">Vui lòng nhập Email.</span>
+                            <span *ngIf="employeeForm.get('email')?.hasError('email')">Email không hợp lệ.</span>
+                        </div>
+                    </div>
                 </div>
 
                 <div class="form-group">
@@ -183,9 +213,10 @@
                 </div>
 
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" (click)="closeModal()">Hủy</button>
-                    <button type="submit" class="btn btn-primary" [disabled]="employeeForm.invalid">
-                        {{ isEditing ? 'Cập Nhật' : 'Lưu' }}
+                    <button type="button" class="btn btn-secondary" (click)="closeModal()" [disabled]="isSaving">Hủy</button>
+                    <button type="submit" class="btn btn-primary" [disabled]="employeeForm.invalid || isSaving">
+                        <ng-container *ngIf="!isSaving">{{ isEditing ? 'Cập Nhật' : 'Lưu' }}</ng-container>
+                        <ng-container *ngIf="isSaving">Đang lưu...</ng-container>
                     </button>
                 </div>
             </form>

@@ -9,7 +9,7 @@ export const jwtInterceptor: HttpInterceptorFn = (req: HttpRequest<any>, next: H
     const isLoggedIn = currentUser && currentUser.token;
 
     // Check if the request is to our backend API
-    const isApiUrl = req.url.startsWith('http://localhost:8081/api');
+    const isApiUrl = req.url.includes('/api');
 
     if (isLoggedIn && isApiUrl) {
         req = req.clone({

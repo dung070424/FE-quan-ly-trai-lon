@@ -11,6 +11,8 @@ export interface Employee {
     address?: string;
     gender?: string;
     phoneNumber?: string;
+    email?: string;
+    image?: string;
 }
 
 @Injectable({
