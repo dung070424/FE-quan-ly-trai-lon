@@ -47,6 +47,15 @@ export class AuthService {
             );
     }
 
+    forgotPassword(data: { username: string, email: string }): Observable<any> {
+        // expect text response or json, we map it as text to prevent parsing errors if backend sends plain string
+        return this.http.post(`${this.apiUrl}/forgot-password`, data, { responseType: 'text' });
+    }
+
+    resetPassword(data: { username: string, resetCode: string, newPassword: string }): Observable<any> {
+        return this.http.post(`${this.apiUrl}/reset-password`, data, { responseType: 'text' });
+    }
+
     logout() {
         this.currentUserSubject.next(null);
         this.router.navigate(['/login']);
