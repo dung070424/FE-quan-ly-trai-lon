@@ -108,8 +108,9 @@
                         [class.bg-red]="getProgressPercentage(inv.quantity, inv.maxQuantity) <= 20">
                     </div>
                 </div>
-                <div class="card-actions">
+                <div class="card-actions" style="gap: 8px;">
                     <button class="btn btn-sm btn-outline-danger" (click)="openExportModal(inv)">Xuất kho</button>
+                    <button class="btn btn-sm btn-danger" (click)="openDeleteModal(inv)">Xóa</button>
                 </div>
             </div>
         </div>
@@ -177,7 +178,9 @@
 
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" (click)="closeImportModal()">Hủy</button>
-                    <button type="submit" class="btn btn-warning" [disabled]="importForm.invalid">Nhập Kho</button>
+                    <button type="submit" class="btn btn-warning" [disabled]="importForm.invalid || isSubmitting">
+                        {{ isSubmitting ? 'Đang lưu...' : 'Nhập Kho' }}
+                    </button>
                 </div>
             </form>
         </div>
@@ -260,6 +263,25 @@
 
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" (click)="closeHistoryModal()">Đóng</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Delete Confirmation Modal -->
+<div class="modal-overlay" *ngIf="isDeleteModalOpen">
+    <div class="modal-content modal-sm">
+        <div class="modal-header">
+            <h2 class="text-danger">Xác nhận xóa</h2>
+            <button class="close-btn" (click)="closeDeleteModal()">×</button>
+        </div>
+        <div class="modal-body">
+            <p class="confirm-message">Bạn có chắc chắn muốn xóa <strong>{{ currentDeleteInventory?.camName }}</strong> khỏi kho không? Hành động này sẽ xóa dữ liệu tồn kho vĩnh viễn.</p>
+            <div class="modal-footer" style="border-top: none; padding: 24px 0 0 0; background: transparent;">
+                <button type="button" class="btn btn-secondary" (click)="closeDeleteModal()">Hủy</button>
+                <button type="button" class="btn btn-danger" (click)="confirmDelete()" [disabled]="isSubmitting">
+                    {{ isSubmitting ? 'Đang xóa...' : 'Xóa Cám' }}
+                </button>
             </div>
         </div>
     </div>

@@ -20,14 +20,17 @@ export class KhoCamComponent implements OnInit {
     importHistory: CamImportHistory[] = [];
     isHistoryModalOpen = false;
     totalImportCost = 0;
+    isSubmitting = false;
 
     // Modals
     isImportModalOpen = false;
     isExportModalOpen = false;
+    isDeleteModalOpen = false;
     importForm: FormGroup;
     exportForm: FormGroup;
 
     currentExportInventory: CamInventory | null = null;
+    currentDeleteInventory: CamInventory | null = null;
 
     constructor(
         private khoCamService: KhoCamService,
@@ -161,14 +164,16 @@ export class KhoCamComponent implements OnInit {
 
     closeImportModal(): void {
         this.isImportModalOpen = false;
+        this.isSubmitting = false;
     }
 
     saveImport(): void {
-        if (this.importForm.invalid) {
+        if (this.importForm.invalid || this.isSubmitting) {
             this.importForm.markAllAsTouched();
             return;
         }
 
+        this.isSubmitting = true;
         const formValue = this.importForm.value;
         const payload: CamInventory = {
             camId: parseInt(formValue.camId, 10),
@@ -185,8 +190,12 @@ export class KhoCamComponent implements OnInit {
             next: (res) => {
                 this.loadInventories();
                 this.closeImportModal();
+                this.isSubmitting = false;
             },
-            error: (err) => console.error('Error importing', err)
+            error: (err) => {
+                console.error('Error importing', err);
+                this.isSubmitting = false;
+            }
         });
     }
 
@@ -240,5 +249,33 @@ export class KhoCamComponent implements OnInit {
 
     closeHistoryModal(): void {
         this.isHistoryModalOpen = false;
+    }
+
+    // Delete Modal Actions
+    openDeleteModal(inventory: CamInventory): void {
+        this.currentDeleteInventory = inventory;
+        this.isDeleteModalOpen = true;
+    }
+
+    closeDeleteModal(): void {
+        this.isDeleteModalOpen = false;
+        this.currentDeleteInventory = null;
+        this.isSubmitting = false;
+    }
+
+    confirmDelete(): void {
+        if (!this.currentDeleteInventory?.id || this.isSubmitting) return;
+
+        this.isSubmitting = true;
+        this.khoCamService.deleteInventory(this.currentDeleteInventory.id).subscribe({
+            next: () => {
+                this.loadInventories();
+                this.closeDeleteModal();
+            },
+            error: (err) => {
+                console.error('Error deleting inventory', err);
+                this.isSubmitting = false;
+            }
+        });
     }
 }
