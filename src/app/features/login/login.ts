@@ -1,8 +1,9 @@
-import { Component, inject, ChangeDetectorRef } from '@angular/core';
+import { Component, inject, ChangeDetectorRef, NgZone, OnDestroy } from '@angular/core';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { Router, ActivatedRoute } from '@angular/router';
 import { AuthService } from '../../core/services/auth.service';
 import { CommonModule } from '@angular/common';
+import { interval, Subscription, BehaviorSubject } from 'rxjs';
 
 @Component({
   selector: 'app-login',
@@ -11,7 +12,7 @@ import { CommonModule } from '@angular/common';
   templateUrl: './login.html',
   styleUrls: ['./login.scss']
 })
-export class LoginComponent {
+export class LoginComponent implements OnDestroy {
   loginForm: FormGroup;
   forgotForm: FormGroup;
   resetPasswordForm: FormGroup;
@@ -30,6 +31,11 @@ export class LoginComponent {
   resetLoading = false;
   resetSubmitted = false;
   resetError = '';
+
+  otpCountdown = 60;
+  otpExpired = false;
+  private countdownSub: Subscription | null = null;
+  countdownDisplay$ = new BehaviorSubject<number>(60);
 
   private authService = inject(AuthService);
   private router = inject(Router);
@@ -112,8 +118,9 @@ export class LoginComponent {
 
     this.forgotLoading = true;
     
-    // Yêu cầu của user: Chuyển màn hình ngay lập tức khi bấm nút
-    this.forgotPasswordStep = 2; 
+    // Chuyển màn hình ngay lập tức khi bấm nút
+    this.forgotPasswordStep = 2;
+    this.startCountdown();
     this.cdr.detectChanges(); 
 
     this.authService.forgotPassword({
@@ -134,12 +141,76 @@ export class LoginComponent {
         this.forgotLoading = false;
         // Quay lại bước 1 nếu có lỗi
         this.forgotPasswordStep = 1;
+        this.stopCountdown();
         if (err.status === 400 && err.error) {
           this.forgotError = err.error;
         } else {
           this.forgotError = 'Đã xảy ra lỗi. Vui lòng thử lại sau.';
         }
-        this.cdr.detectChanges(); // Force UI update
+        this.cdr.detectChanges();
+      }
+    });
+  }
+
+  startCountdown() {
+    this.stopCountdown();
+    this.otpCountdown = 60;
+    this.otpExpired = false;
+    this.countdownDisplay$.next(60);
+    let remaining = 60;
+    this.countdownSub = interval(1000).subscribe(() => {
+      remaining--;
+      this.otpCountdown = remaining;
+      this.countdownDisplay$.next(remaining);
+      if (remaining <= 0) {
+        this.otpExpired = true;
+        this.stopCountdown();
+      }
+    });
+  }
+
+  stopCountdown() {
+    if (this.countdownSub) {
+      this.countdownSub.unsubscribe();
+      this.countdownSub = null;
+    }
+  }
+
+  ngOnDestroy() {
+    this.stopCountdown();
+  }
+
+  switchToStep2() {
+    this.forgotPasswordStep = 2;
+    this.startCountdown();
+    this.cdr.detectChanges();
+  }
+
+  resendOtp() {
+    this.resetSubmitted = false;
+    this.resetError = '';
+    this.forgotSuccess = '';
+    this.resetPasswordForm.reset();
+
+    // Gửi lại OTP bằng username/email đã nhập từ bước 1
+    const username = this.fg['username'].value;
+    const email = this.fg['email'].value;
+
+    // Reset đồng hồ và hiển thị trạng thái đang gửi
+    this.stopCountdown();
+    this.countdownDisplay$.next(60);
+    this.otpExpired = false;
+    this.forgotSuccess = 'Đang gửi lại mã OTP...';
+
+    this.authService.forgotPassword({ username, email }).subscribe({
+      next: () => {
+        this.forgotSuccess = 'Mã OTP mới đã được gửi vào email của bạn.';
+        this.startCountdown();
+      },
+      error: (err) => {
+        this.forgotSuccess = '';
+        this.resetError = err.status === 400 && err.error ? err.error : 'Đã xảy ra lỗi khi gửi lại mã. Vui lòng thử lại.';
+        this.startCountdown(); // Vẫn bắt đầu đếm lại dù có lỗi
       }
     });
   }
