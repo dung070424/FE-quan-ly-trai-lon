@@ -35,7 +35,7 @@
         </div>
 
         <div class="action-buttons">
-            <button class="btn btn-warning" (click)="openImportModal()">
+            <button class="btn btn-warning" (click)="openImportModal()" *ngIf="isAdmin">
                 <span>+</span> Nhập kho
             </button>
             <button class="btn btn-danger" (click)="openHistoryModal()">
@@ -110,7 +110,7 @@
                 </div>
                 <div class="card-actions" style="gap: 8px;">
                     <button class="btn btn-sm btn-outline-danger" (click)="openExportModal(inv)">Xuất kho</button>
-                    <button class="btn btn-sm btn-danger" (click)="openDeleteModal(inv)">Xóa</button>
+                    <button class="btn btn-sm btn-danger" (click)="openDeleteModal(inv)" *ngIf="isAdmin">Xóa</button>
                 </div>
             </div>
         </div>

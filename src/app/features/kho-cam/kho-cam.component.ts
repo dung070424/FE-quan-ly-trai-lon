@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, FormsModule, Validators } from '@angular/forms';
 import { KhoCamService, CamInventory, CamImportHistory } from './kho-cam.service';
 import { CamService, Cam } from '../cam/cam.service';
+import { AuthService } from '../../core/services/auth.service';
 
 @Component({
     selector: 'app-kho-cam',
@@ -36,7 +37,8 @@ export class KhoCamComponent implements OnInit {
         private khoCamService: KhoCamService,
         private camService: CamService,
         private fb: FormBuilder,
-        private cdr: ChangeDetectorRef
+        private cdr: ChangeDetectorRef,
+        private authService: AuthService
     ) {
         this.importForm = this.fb.group({
             camId: ['', Validators.required],
@@ -76,6 +78,10 @@ export class KhoCamComponent implements OnInit {
             },
             error: (err) => console.error('Error fetching cams', err)
         });
+    }
+
+    get isAdmin(): boolean {
+        return this.authService.currentUserValue?.role === 'ADMIN';
     }
 
     // Computed properties for Dashboard

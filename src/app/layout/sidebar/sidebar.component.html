@@ -27,11 +27,13 @@
                         @if (item.expanded) {
                             <ul class="sub-menu">
                                 @for (child of item.children; track child.label) {
-                                    <li routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}">
-                                        <a [routerLink]="child.path">
-                                            <span class="nav-label">{{ child.label }}</span>
-                                        </a>
-                                    </li>
+                                    @if (child.roles.includes(currentUserRole)) {
+                                        <li routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}">
+                                            <a [routerLink]="child.path">
+                                                <span class="nav-label">{{ child.label }}</span>
+                                            </a>
+                                        </li>
+                                    }
                                 }
                             </ul>
                         }

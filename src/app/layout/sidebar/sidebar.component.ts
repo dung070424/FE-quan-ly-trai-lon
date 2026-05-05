@@ -22,7 +22,7 @@ export class SidebarComponent {
             roles: ['ADMIN', 'NHANVIEN'],
             expanded: false,
             children: [
-                { label: 'Cám Ăn', path: '/quan-ly-cam-an', roles: ['ADMIN', 'NHANVIEN'] },
+                { label: 'Cám Ăn', path: '/quan-ly-cam-an', roles: ['ADMIN'] },
                 { label: 'Kho Cám', path: '/quan-ly-kho-cam', roles: ['ADMIN', 'NHANVIEN'] }
             ]
         },
@@ -32,7 +32,7 @@ export class SidebarComponent {
             roles: ['ADMIN', 'NHANVIEN'],
             expanded: false,
             children: [
-                { label: 'Thuốc', path: '/quan-ly-thuoc', roles: ['ADMIN', 'NHANVIEN'] },
+                { label: 'Thuốc', path: '/quan-ly-thuoc', roles: ['ADMIN'] },
                 { label: 'Kho Thuốc', path: '/quan-ly-kho-thuoc', roles: ['ADMIN', 'NHANVIEN'] }
             ]
         },
@@ -53,5 +53,9 @@ export class SidebarComponent {
         if (!this.authService.currentUserValue) return [];
         const userRole = this.authService.currentUserValue.role;
         return this.menuItems.filter(item => item.roles.includes(userRole));
+    }
+
+    get currentUserRole() {
+        return this.authService.currentUserValue?.role || '';
     }
 }

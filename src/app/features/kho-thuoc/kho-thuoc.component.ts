@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, FormsModule, Validators } from '@angular/forms';
 import { KhoThuocService, MedicineInventory, MedicineImportHistory } from './kho-thuoc.service';
 import { ThuocService, Medicine } from '../thuoc/thuoc.service';
+import { AuthService } from '../../core/services/auth.service';
 
 @Component({
     selector: 'app-kho-thuoc',
@@ -36,7 +37,8 @@ export class KhoThuocComponent implements OnInit {
         private khoThuocService: KhoThuocService,
         private thuocService: ThuocService,
         private fb: FormBuilder,
-        private cdr: ChangeDetectorRef
+        private cdr: ChangeDetectorRef,
+        private authService: AuthService
     ) {
         this.importForm = this.fb.group({
             medicineId: ['', Validators.required],
@@ -76,6 +78,10 @@ export class KhoThuocComponent implements OnInit {
             },
             error: (err) => console.error('Error fetching medicines', err)
         });
+    }
+
+    get isAdmin(): boolean {
+        return this.authService.currentUserValue?.role === 'ADMIN';
     }
 
     // Computed properties for Dashboard
