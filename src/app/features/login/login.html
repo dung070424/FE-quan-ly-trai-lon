@@ -1,35 +1,79 @@
-<div class="login-wrapper">
-    <div class="login-container">
-        <div class="login-header">
-            <h2>Welcome Back</h2>
-            <p>Log in to manage your precision farm.</p>
+<div class="login-layout">
+    <div class="left-panel">
+        <div class="panel-content">
+            <div class="brand">
+                <div class="brand-icon">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M19 5c-1.5 0-2.8 1.4-3 2-3.5-1.5-11-.3-11 5 0 1.8 0 3 2 4.5V20h4v-2h3v2h4v-4c1-.5 1.7-1 2-2h2v-4h-2c0-1-.5-1.5-1-2h0V5z"/>
+                        <path d="M2 9v1c0 1.1.9 2 2 2h1"/>
+                        <path d="M16 11h.01"/>
+                    </svg>
+                </div>
+                <span class="brand-text">Quản lý Trại Lợn</span>
+            </div>
+            <div class="footer-text">
+                © 2026 Hệ thống Quản Lý Trại Lợn
+            </div>
         </div>
-
-        <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" class="login-form">
-            <div class="form-group">
-                <label for="username">Username</label>
-                <input type="text" id="username" formControlName="username" class="form-control"
-                    [ngClass]="{ 'is-invalid': submitted && f['username'].errors }" placeholder="Enter username" />
-                <div *ngIf="submitted && f['username'].errors" class="invalid-feedback">
-                    <div *ngIf="f['username'].errors['required']">Username is required</div>
+    </div>
+    
+    <div class="right-panel">
+        <div class="form-container">
+            <div class="form-header">
+                <div class="logo-circle">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="#2e7d32" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M19 5c-1.5 0-2.8 1.4-3 2-3.5-1.5-11-.3-11 5 0 1.8 0 3 2 4.5V20h4v-2h3v2h4v-4c1-.5 1.7-1 2-2h2v-4h-2c0-1-.5-1.5-1-2h0V5z"/>
+                        <path d="M2 9v1c0 1.1.9 2 2 2h1"/>
+                        <path d="M16 11h.01"/>
+                    </svg>
                 </div>
+                <h2>Đăng nhập</h2>
+                <p>Hệ thống Quản Lý Trại Lợn</p>
             </div>
 
-            <div class="form-group">
-                <label for="password">Password</label>
-                <input type="password" id="password" formControlName="password" class="form-control"
-                    [ngClass]="{ 'is-invalid': submitted && f['password'].errors }" placeholder="Enter password" />
-                <div *ngIf="submitted && f['password'].errors" class="invalid-feedback">
-                    <div *ngIf="f['password'].errors['required']">Password is required</div>
+            <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" class="login-form">
+                <div class="form-group">
+                    <label for="username">Tên đăng nhập <span class="required">*</span></label>
+                    <div class="input-wrapper" [ngClass]="{ 'is-invalid': submitted && f['username'].errors }">
+                        <div class="icon-left">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+                        </div>
+                        <input type="text" id="username" formControlName="username" class="form-control" placeholder="Nhập tên đăng nhập" autocomplete="off" />
+                    </div>
+                    <div *ngIf="submitted && f['username'].errors" class="error-text">
+                        <span *ngIf="f['username'].errors['required']">Vui lòng nhập tên đăng nhập</span>
+                    </div>
                 </div>
-            </div>
 
-            <div *ngIf="error" class="alert alert-danger mt-3 mb-0">{{error}}</div>
+                <div class="form-group">
+                    <label for="password">Mật khẩu <span class="required">*</span></label>
+                    <div class="input-wrapper" [ngClass]="{ 'is-invalid': submitted && f['password'].errors }">
+                        <div class="icon-left">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+                        </div>
+                        <input type="password" id="password" formControlName="password" class="form-control" placeholder="Nhập mật khẩu" autocomplete="off" />
+                    </div>
+                    <div *ngIf="submitted && f['password'].errors" class="error-text">
+                        <span *ngIf="f['password'].errors['required']">Vui lòng nhập mật khẩu</span>
+                    </div>
+                </div>
+                
+                <div class="forgot-password">
+                    <a href="#">Quên mật khẩu?</a>
+                </div>
 
-            <button [disabled]="loading" class="btn btn-primary login-button">
-                <span *ngIf="loading" class="spinner-border spinner-border-sm me-1"></span>
-                Login
-            </button>
-        </form>
+                <div *ngIf="error" class="alert-error">
+                    <span>{{error}}</span>
+                </div>
+
+                <button [disabled]="loading" class="btn-login" type="submit">
+                    <span *ngIf="loading" class="spinner"></span>
+                    <ng-container *ngIf="!loading">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="btn-icon"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+                        <span>Đăng nhập</span>
+                    </ng-container>
+                </button>
+            </form>
+        </div>
     </div>
 </div>

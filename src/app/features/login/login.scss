@@ -1,35 +1,121 @@
-.login-wrapper {
+
+$primary: #66bb6a;
+$primary-hover: #4caf50;
+$text-dark: #333333;
+$text-light: #757575;
+$border-color: #e0e0e0;
+$error: #e53935;
+$bg-light: #f9f9f9;
+
+.login-layout {
+    display: flex;
+    min-height: 100vh;
+    font-family: 'Inter', sans-serif;
+    background-color: #ffffff;
+}
+
+.left-panel {
+    flex: 6; /* 60% */
+    background-image: url('../../../assets/images/login-bg.png');
+    background-size: cover;
+    background-position: center;
+    position: relative;
+    color: white;
+
+    &::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0, 0, 0, 0.2); /* Slight darkening for text readability */
+    }
+
+    .panel-content {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        padding: 2.5rem;
+        z-index: 1;
+    }
+
+    .brand {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+
+        .brand-icon {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 40px;
+            height: 40px;
+            background-color: rgba(255, 255, 255, 0.2);
+            border-radius: 50%;
+            backdrop-filter: blur(4px);
+        }
+
+        .brand-text {
+            font-size: 1.25rem;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+        }
+    }
+
+    .footer-text {
+        font-size: 0.85rem;
+        font-weight: 500;
+        text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+    }
+}
+
+.right-panel {
+    flex: 4; /* 40% */
+    min-width: 400px;
+    background-color: #ffffff;
     display: flex;
     justify-content: center;
     align-items: center;
-    min-height: 100vh;
-    background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
     padding: 2rem;
 }
 
-.login-container {
-    background: white;
-    padding: 3rem 2.5rem;
-    border-radius: 12px;
-    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
+.form-container {
     width: 100%;
-    max-width: 400px;
-    text-align: center;
+    max-width: 380px;
 }
 
-.login-header {
-    margin-bottom: 2rem;
+.form-header {
+    text-align: center;
+    margin-bottom: 2.5rem;
+
+    .logo-circle {
+        width: 60px;
+        height: 60px;
+        background-color: #e8f5e9;
+        border-radius: 50%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        margin: 0 auto 1rem;
+    }
 
     h2 {
-        color: #2c3e50;
+        color: $text-dark;
         font-size: 1.75rem;
         font-weight: 700;
-        margin-bottom: 0.5rem;
+        margin-bottom: 0.25rem;
     }
 
     p {
-        color: #7f8c8d;
-        font-size: 0.95rem;
+        color: $text-light;
+        font-size: 0.9rem;
         margin: 0;
     }
 }
@@ -37,88 +123,164 @@
 .login-form {
     display: flex;
     flex-direction: column;
-    gap: 1.5rem;
+    gap: 1.25rem;
 
     .form-group {
-        text-align: left;
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
 
         label {
-            display: block;
-            margin-bottom: 0.5rem;
-            color: #34495e;
-            font-weight: 500;
-            font-size: 0.9rem;
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: $text-dark;
+
+            .required {
+                color: $error;
+            }
         }
 
-        .form-control {
-            width: 100%;
-            padding: 0.75rem 1rem;
-            border: 1px solid #ced4da;
+        .input-wrapper {
+            display: flex;
+            align-items: center;
+            border: 1px solid $border-color;
             border-radius: 8px;
-            font-size: 1rem;
-            transition: all 0.2s ease-in-out;
-            box-sizing: border-box;
+            background-color: #ffffff;
+            transition: all 0.2s ease;
+            overflow: hidden;
 
-            &:focus {
-                border-color: #3498db;
-                box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.2);
+            .icon-left {
+                padding: 0.75rem 0.5rem 0.75rem 1rem;
+                color: #9e9e9e;
+                display: flex;
+                align-items: center;
+            }
+
+            .form-control {
+                flex: 1;
+                border: none;
+                padding: 0.75rem 1rem 0.75rem 0;
+                font-size: 0.95rem;
+                color: $text-dark;
+                background: transparent;
                 outline: none;
+
+                &::placeholder {
+                    color: #bdbdbd;
+                    font-size: 0.9rem;
+                }
+            }
+
+            &:focus-within {
+                border-color: $primary;
+                box-shadow: 0 0 0 3px rgba(102, 187, 106, 0.1);
+                
+                .icon-left {
+                    color: $primary;
+                }
             }
 
             &.is-invalid {
-                border-color: #e74c3c;
+                border-color: $error;
+                
+                .icon-left {
+                    color: $error;
+                }
 
-                &:focus {
-                    box-shadow: 0 0 0 3px rgba(231, 76, 60, 0.2);
+                &:focus-within {
+                    box-shadow: 0 0 0 3px rgba(229, 57, 53, 0.1);
                 }
             }
         }
 
-        .invalid-feedback {
-            color: #e74c3c;
+        .error-text {
+            color: $error;
             font-size: 0.8rem;
-            margin-top: 0.4rem;
+            font-weight: 500;
+            margin-top: 0.25rem;
         }
     }
 
-    .alert-danger {
-        color: #e74c3c;
-        background-color: #fadbd8;
-        border: 1px solid #f5b7b1;
-        padding: 0.75rem;
-        border-radius: 8px;
-        font-size: 0.9rem;
-        text-align: left;
+    .forgot-password {
+        text-align: right;
+        margin-top: -0.5rem;
+
+        a {
+            color: $primary;
+            font-size: 0.85rem;
+            font-weight: 500;
+            text-decoration: none;
+            transition: color 0.2s;
+
+            &:hover {
+                color: $primary-hover;
+                text-decoration: underline;
+            }
+        }
     }
 
-    .login-button {
+    .alert-error {
+        background-color: #ffebee;
+        color: #c62828;
+        padding: 0.75rem;
+        border-radius: 6px;
+        font-size: 0.85rem;
+        font-weight: 500;
+        text-align: center;
+        border: 1px solid #ffcdd2;
+    }
+
+    .btn-login {
         width: 100%;
         padding: 0.85rem;
         border: none;
         border-radius: 8px;
-        background-color: #3498db;
+        background-color: $primary;
         color: white;
-        font-size: 1.05rem;
+        font-size: 1rem;
         font-weight: 600;
         cursor: pointer;
-        transition: background-color 0.2s, transform 0.1s;
+        transition: background-color 0.2s;
         display: flex;
         justify-content: center;
         align-items: center;
         gap: 0.5rem;
+        margin-top: 0.5rem;
 
         &:hover {
-            background-color: #2980b9;
-        }
-
-        &:active {
-            transform: scale(0.98);
+            background-color: $primary-hover;
         }
 
         &:disabled {
-            background-color: #95a5a6;
+            background-color: #e0e0e0;
+            color: #9e9e9e;
             cursor: not-allowed;
-            transform: none;
         }
+    }
+}
+
+/* Spinner animation */
+.spinner {
+    width: 18px;
+    height: 18px;
+    border: 2px solid rgba(255,255,255,0.3);
+    border-radius: 50%;
+    border-top-color: white;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+/* Responsive adjustment */
+@media (max-width: 900px) {
+    .left-panel {
+        display: none;
+    }
+    
+    .right-panel {
+        flex: 1;
+        min-width: 100%;
     }
 }
