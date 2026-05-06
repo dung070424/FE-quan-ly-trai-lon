@@ -8,6 +8,12 @@ export const authGuard: CanActivateFn = (route: ActivatedRouteSnapshot, state: R
     const currentUser = authService.currentUserValue;
 
     if (currentUser) {
+        // Nếu tài khoản đăng nhập lần đầu, bắt buộc đổi mật khẩu trước
+        if (currentUser.mustChangePassword) {
+            router.navigate(['/login']);
+            return false;
+        }
+
         // check if route is restricted by role
         if (route.data && route.data['roles'] && route.data['roles'].indexOf(currentUser.role) === -1) {
             // role not authorized so redirect to home page based on role

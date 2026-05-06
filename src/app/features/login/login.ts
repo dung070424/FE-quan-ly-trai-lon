@@ -16,10 +16,17 @@ export class LoginComponent implements OnDestroy {
   loginForm: FormGroup;
   forgotForm: FormGroup;
   resetPasswordForm: FormGroup;
+  firstLoginForm: FormGroup;
   loading = false;
   submitted = false;
   error = '';
   returnUrl: string;
+
+  // First login
+  isFirstLoginModal = false;
+  firstLoginSubmitted = false;
+  firstLoginLoading = false;
+  firstLoginError = '';
 
   isForgotModalOpen = false;
   forgotPasswordStep = 1;
@@ -44,10 +51,7 @@ export class LoginComponent implements OnDestroy {
   private cdr = inject(ChangeDetectorRef);
 
   constructor(private formBuilder: FormBuilder) {
-    if (this.authService.currentUserValue) {
-      this.router.navigate(['/']);
-    }
-
+    // Khởi tạo tất cả forms TRƯỚC
     this.loginForm = this.formBuilder.group({
       username: ['', Validators.required],
       password: ['', Validators.required]
@@ -66,7 +70,25 @@ export class LoginComponent implements OnDestroy {
       validator: this.mustMatch('newPassword', 'confirmPassword')
     });
 
+    this.firstLoginForm = this.formBuilder.group({
+      newPassword: ['', [Validators.required, Validators.minLength(6)]],
+      confirmPassword: ['', Validators.required]
+    }, {
+      validator: this.mustMatch('newPassword', 'confirmPassword')
+    });
+
     this.returnUrl = this.route.snapshot.queryParams['returnUrl'] || '/';
+
+    // Kiểm tra mustChangePassword SAU khi forms đã sẵn sàng
+    const currentUser = this.authService.currentUserValue;
+    if (currentUser) {
+      if (currentUser.mustChangePassword) {
+        // User đã login nhưng cần đổi mật khẩu → hiện modal
+        this.isFirstLoginModal = true;
+      } else {
+        this.router.navigate(['/']);
+      }
+    }
   }
 
   // Custom validator for password match
@@ -90,6 +112,7 @@ export class LoginComponent implements OnDestroy {
   get f() { return this.loginForm.controls; }
   get fg() { return this.forgotForm.controls; }
   get rg() { return this.resetPasswordForm.controls; }
+  get flg() { return this.firstLoginForm.controls; }
 
   openForgotModal(event: Event) {
     event.preventDefault();
@@ -278,7 +301,14 @@ export class LoginComponent implements OnDestroy {
       username: this.f['username'].value,
       password: this.f['password'].value
     }).subscribe({
-      next: () => {
+      next: (user) => {
+        // Nếu đăng nhập lần đầu, bắt buộc đổi mật khẩu
+        if (user && user.mustChangePassword) {
+          this.loading = false;
+          this.isFirstLoginModal = true;
+          this.cdr.detectChanges();
+          return;
+        }
         if (this.returnUrl === '/' || this.returnUrl === '/tong-quan') {
           if (this.authService.isRoleAdmin) {
             this.router.navigate(['/tong-quan']);
@@ -294,6 +324,41 @@ export class LoginComponent implements OnDestroy {
       error: error => {
         this.error = 'Tài khoản hoặc mật khẩu không đúng';
         this.loading = false;
+      }
+    });
+  }
+
+  onFirstLoginSubmit() {
+    this.firstLoginSubmitted = true;
+    this.firstLoginError = '';
+
+    if (this.firstLoginForm.invalid) {
+      return;
+    }
+
+    this.firstLoginLoading = true;
+    // Lấy username từ form hoặc từ currentUser (trường hợp redirect từ auth guard)
+    const username = this.f['username'].value || this.authService.currentUserValue?.username;
+    const newPassword = this.flg['newPassword'].value;
+
+    this.authService.changeFirstTimePassword({ username, newPassword }).subscribe({
+      next: () => {
+        this.firstLoginLoading = false;
+        this.isFirstLoginModal = false;
+        // Cập nhật trạng thái mustChangePassword trong bộ nhớ
+        this.authService.markPasswordChanged();
+        // Điều hướng theo role
+        if (this.authService.isRoleAdmin) {
+          this.router.navigate(['/tong-quan']);
+        } else if (this.authService.isRoleNhanvien) {
+          this.router.navigate(['/quan-ly-kho-cam']);
+        } else {
+          this.router.navigate(['/']);
+        }
+      },
+      error: (err) => {
+        this.firstLoginLoading = false;
+        this.firstLoginError = 'Đã xảy ra lỗi. Vui lòng thử lại.';
       }
     });
   }

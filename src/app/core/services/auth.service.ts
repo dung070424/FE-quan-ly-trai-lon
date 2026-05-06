@@ -56,6 +56,18 @@ export class AuthService {
         return this.http.post(`${this.apiUrl}/reset-password`, data, { responseType: 'text' });
     }
 
+    changeFirstTimePassword(data: { username: string, newPassword: string }): Observable<any> {
+        return this.http.post(`${this.apiUrl}/change-password`, data, { responseType: 'text' });
+    }
+
+    markPasswordChanged() {
+        const user = this.currentUserValue;
+        if (user) {
+            user.mustChangePassword = false;
+            this.currentUserSubject.next({ ...user });
+        }
+    }
+
     logout() {
         this.currentUserSubject.next(null);
         this.router.navigate(['/login']);
