@@ -31,6 +31,7 @@ export class LoginComponent implements OnDestroy {
   resetLoading = false;
   resetSubmitted = false;
   resetError = '';
+  otpConfirmed = false;
 
   otpCountdown = 60;
   otpExpired = false;
@@ -101,10 +102,12 @@ export class LoginComponent implements OnDestroy {
     this.forgotError = '';
     this.forgotSuccess = '';
     this.resetError = '';
+    this.otpConfirmed = false;
   }
 
   closeForgotModal() {
     this.isForgotModalOpen = false;
+    this.otpConfirmed = false;
   }
 
   onForgotSubmit() {
@@ -182,8 +185,25 @@ export class LoginComponent implements OnDestroy {
 
   switchToStep2() {
     this.forgotPasswordStep = 2;
+    this.otpConfirmed = false;
     this.startCountdown();
     this.cdr.detectChanges();
+  }
+
+  confirmOtp() {
+    this.resetSubmitted = true;
+    if (this.rg['code'].invalid) {
+      return;
+    }
+    this.resetSubmitted = false;
+    this.resetError = '';
+    this.otpConfirmed = true;
+  }
+
+  backToOtp() {
+    this.otpConfirmed = false;
+    this.resetSubmitted = false;
+    this.resetError = '';
   }
 
   resendOtp() {
