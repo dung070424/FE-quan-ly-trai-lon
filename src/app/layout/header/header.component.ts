@@ -1,4 +1,4 @@
-import { Component, output, inject, HostListener, ElementRef } from '@angular/core';
+import { Component, output, inject, HostListener, ElementRef, ChangeDetectorRef } from '@angular/core';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule, AbstractControl, ValidationErrors } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { AuthService } from '../../core/services/auth.service';
@@ -15,6 +15,7 @@ export class HeaderComponent {
     private authService = inject(AuthService);
     private elementRef = inject(ElementRef);
     private fb = inject(FormBuilder);
+    private cdr = inject(ChangeDetectorRef);
 
     isUserMenuOpen = false;
 
@@ -104,15 +105,20 @@ export class HeaderComponent {
                 this.changePwdSuccess = 'Đổi mật khẩu thành công!';
                 this.changePasswordForm.reset();
                 this.changePwdSubmitted = false;
+                this.cdr.detectChanges(); // Cập nhật UI ngay lập tức
                 setTimeout(() => this.closeChangePassword(), 1500);
             },
             error: (err) => {
                 this.changePwdLoading = false;
-                // Hiển thị thông báo lỗi từ Backend (ví dụ: "Mật khẩu cũ không chính xác")
+                // Hiển thị thông báo lỗi từ Backend
                 this.changePwdError = err.error || 'Đã xảy ra lỗi. Vui lòng thử lại.';
+                
+                // Nếu lỗi là một object, thử lấy message
                 if (typeof err.error === 'object' && err.error.message) {
                     this.changePwdError = err.error.message;
                 }
+                
+                this.cdr.detectChanges(); // Ép Angular cập nhật UI để hiện lỗi và tắt spinner ngay
             }
         });
     }
