@@ -27,6 +27,10 @@ export class HeaderComponent {
     changePwdError = '';
     changePwdSuccess = '';
 
+    // Profile modal
+    isProfileOpen = false;
+    fullProfile: any = null;
+
     // Trạng thái hiển thị mật khẩu
     showOldPassword = false;
     showNewPassword = false;
@@ -79,7 +83,6 @@ export class HeaderComponent {
         this.changePwdError = '';
         this.changePwdSuccess = '';
         
-        // Reset trạng thái con mắt
         this.showOldPassword = false;
         this.showNewPassword = false;
         this.showConfirmPassword = false;
@@ -94,6 +97,35 @@ export class HeaderComponent {
 
     closeChangePassword() {
         this.isChangePasswordOpen = false;
+    }
+
+    openProfile() {
+        this.isUserMenuOpen = false;
+        const code = this.currentUser?.username;
+        if (code) {
+            this.authService.getEmployeeProfile(code).subscribe({
+                next: (data) => {
+                    this.fullProfile = data;
+                    this.isProfileOpen = true;
+                    this.cdr.detectChanges();
+                },
+                error: (err) => {
+                    console.error('Không thể lấy thông tin nhân viên:', err);
+                    // Fallback to basic info if fail
+                    this.fullProfile = {
+                        name: this.currentUser.name,
+                        employeeCode: this.currentUser.username,
+                        image: this.currentUser.image
+                    };
+                    this.isProfileOpen = true;
+                    this.cdr.detectChanges();
+                }
+            });
+        }
+    }
+
+    closeProfile() {
+        this.isProfileOpen = false;
     }
 
     get cpg() { return this.changePasswordForm.controls; }

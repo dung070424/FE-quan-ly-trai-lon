@@ -13,6 +13,8 @@ export class AuthService {
     private platformId = inject(PLATFORM_ID);
 
     private apiUrl = 'http://localhost:8081/api/auth';
+    private employeeUrl = 'http://localhost:8081/api/employees';
+    
     private currentUserSubject = new BehaviorSubject<any>(null);
     public currentUser$ = this.currentUserSubject.asObservable();
 
@@ -48,7 +50,6 @@ export class AuthService {
     }
 
     forgotPassword(data: { username: string, email: string }): Observable<any> {
-        // expect text response or json, we map it as text to prevent parsing errors if backend sends plain string
         return this.http.post(`${this.apiUrl}/forgot-password`, data, { responseType: 'text' });
     }
 
@@ -58,6 +59,10 @@ export class AuthService {
 
     changeFirstTimePassword(data: { username: string, oldPassword?: string, newPassword: string }): Observable<any> {
         return this.http.post(`${this.apiUrl}/change-password`, data, { responseType: 'text' });
+    }
+
+    getEmployeeProfile(code: string): Observable<any> {
+        return this.http.get(`${this.employeeUrl}/code/${code}`);
     }
 
     markPasswordChanged() {
