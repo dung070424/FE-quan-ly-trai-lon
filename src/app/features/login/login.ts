@@ -1,5 +1,5 @@
 import { Component, inject, ChangeDetectorRef, NgZone, OnDestroy } from '@angular/core';
-import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
+import { FormBuilder, FormGroup, Validators, ReactiveFormsModule, AbstractControl, ValidationErrors } from '@angular/forms';
 import { Router, ActivatedRoute } from '@angular/router';
 import { AuthService } from '../../core/services/auth.service';
 import { CommonModule } from '@angular/common';
@@ -64,14 +64,14 @@ export class LoginComponent implements OnDestroy {
 
     this.resetPasswordForm = this.formBuilder.group({
       code: ['', [Validators.required, Validators.pattern('^[0-9]{6}$')]],
-      newPassword: ['', [Validators.required, Validators.minLength(6)]],
+      newPassword: ['', [Validators.required, Validators.minLength(8), this.strongPasswordValidator]],
       confirmPassword: ['', Validators.required]
     }, {
       validator: this.mustMatch('newPassword', 'confirmPassword')
     });
 
     this.firstLoginForm = this.formBuilder.group({
-      newPassword: ['', [Validators.required, Validators.minLength(6)]],
+      newPassword: ['', [Validators.required, Validators.minLength(8), this.strongPasswordValidator]],
       confirmPassword: ['', Validators.required]
     }, {
       validator: this.mustMatch('newPassword', 'confirmPassword')
@@ -89,6 +89,18 @@ export class LoginComponent implements OnDestroy {
         this.router.navigate(['/']);
       }
     }
+  }
+
+  // Custom validator: mật khẩu mạnh
+  strongPasswordValidator(control: AbstractControl): ValidationErrors | null {
+    const value = control.value || '';
+    if (!value) return null;
+    const errors: { [key: string]: boolean } = {};
+    if (!/[A-Z]/.test(value)) errors['noUpperCase'] = true;
+    if (!/[a-z]/.test(value)) errors['noLowerCase'] = true;
+    if (!/[0-9]/.test(value)) errors['noNumeric'] = true;
+    if (!/[@$!%*?&#^()_\-+=~`|{}\[\]:;"'<>,.?/\\]/.test(value)) errors['noSpecial'] = true;
+    return Object.keys(errors).length ? errors : null;
   }
 
   // Custom validator for password match
