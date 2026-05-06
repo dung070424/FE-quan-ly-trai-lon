@@ -184,12 +184,19 @@
                     </div>
                 </div>
 
+                <!-- Error message for verification -->
+                <div *ngIf="resetError" style="background-color: #ffebee; color: #c62828; padding: 10px; border-radius: 6px; font-size: 13px; margin-bottom: 16px; border: 1px solid #ffcdd2; display: flex; align-items: center; gap: 8px;">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
+                    {{resetError}}
+                </div>
+
                 <div class="modal-footer" style="display: flex; justify-content: flex-end; gap: 12px; margin-top: 24px;">
-                    <button type="button" class="btn btn-outline" (click)="forgotPasswordStep = 1; stopCountdown()" style="padding: 10px 20px; border-radius: 8px; border: 1px solid #ddd; background: white; cursor: pointer; font-weight: 500;">
+                    <button type="button" class="btn btn-outline" (click)="forgotPasswordStep = 1; stopCountdown()" [disabled]="resetLoading" style="padding: 10px 20px; border-radius: 8px; border: 1px solid #ddd; background: white; cursor: pointer; font-weight: 500;">
                         Quay lại
                     </button>
-                    <button type="button" class="btn btn-primary" (click)="confirmOtp()" style="padding: 10px 20px; border-radius: 8px; border: none; background: #2e7d32; color: white; cursor: pointer; font-weight: 500;">
-                        Tiếp tục
+                    <button type="button" class="btn btn-primary" (click)="confirmOtp()" [disabled]="resetLoading || otpExpired" style="padding: 10px 20px; border-radius: 8px; border: none; background: #2e7d32; color: white; cursor: pointer; font-weight: 500; min-width: 100px; display: flex; align-items: center; justify-content: center; gap: 8px;">
+                        <span *ngIf="resetLoading" class="spinner" style="width: 16px; height: 16px;"></span>
+                        {{ resetLoading ? 'Đang kiểm tra...' : 'Tiếp tục' }}
                     </button>
                 </div>
             </ng-container>

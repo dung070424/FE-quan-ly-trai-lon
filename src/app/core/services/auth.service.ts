@@ -57,6 +57,10 @@ export class AuthService {
         return this.http.post(`${this.apiUrl}/reset-password`, data, { responseType: 'text' });
     }
 
+    verifyResetCode(data: { username: string, resetCode: string }): Observable<any> {
+        return this.http.post(`${this.apiUrl}/verify-reset-code`, data, { responseType: 'text' });
+    }
+
     changeFirstTimePassword(data: { username: string, oldPassword?: string, newPassword: string }): Observable<any> {
         return this.http.post(`${this.apiUrl}/change-password`, data, { responseType: 'text' });
     }

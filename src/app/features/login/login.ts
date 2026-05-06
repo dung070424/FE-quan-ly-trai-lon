@@ -237,9 +237,30 @@ export class LoginComponent implements OnDestroy {
     if (this.rg['code'].invalid) {
       return;
     }
-    this.resetSubmitted = false;
+    
+    this.resetLoading = true;
     this.resetError = '';
-    this.otpConfirmed = true;
+    
+    const username = this.forgotForm.value.username;
+    const resetCode = this.resetPasswordForm.value.code;
+    
+    this.authService.verifyResetCode({ username, resetCode }).subscribe({
+      next: () => {
+        this.resetLoading = false;
+        this.resetSubmitted = false;
+        this.otpConfirmed = true;
+        this.cdr.detectChanges();
+      },
+      error: (err) => {
+        this.resetLoading = false;
+        if (err.status === 404) {
+          this.resetError = 'Lỗi kết nối Server. Vui lòng restart lại Backend (Java).';
+        } else {
+          this.resetError = 'Mã xác nhận không chính xác hoặc đã hết hạn.';
+        }
+        this.cdr.detectChanges();
+      }
+    });
   }
 
   backToOtp() {
