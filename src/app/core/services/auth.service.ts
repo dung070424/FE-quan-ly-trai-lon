@@ -56,7 +56,7 @@ export class AuthService {
         return this.http.post(`${this.apiUrl}/reset-password`, data, { responseType: 'text' });
     }
 
-    changeFirstTimePassword(data: { username: string, newPassword: string }): Observable<any> {
+    changeFirstTimePassword(data: { username: string, oldPassword?: string, newPassword: string }): Observable<any> {
         return this.http.post(`${this.apiUrl}/change-password`, data, { responseType: 'text' });
     }
 

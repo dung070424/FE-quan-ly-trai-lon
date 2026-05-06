@@ -43,9 +43,19 @@
             </button>
             
             @if (isUserMenuOpen) {
-                <div class="dropdown-menu show" style="position: absolute; right: 0; top: 100%; margin-top: 10px; background: white; border: 1px solid #e0e0e0; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); padding: 8px 0; min-width: 180px; z-index: 1050;">
-                    <button class="dropdown-item text-danger d-flex align-items-center" (click)="logout()" style="width: 100%; text-align: left; padding: 10px 16px; border: none; background: transparent; cursor: pointer; font-weight: 500;">
-                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right: 12px;">
+                <div class="dropdown-menu show">
+                    <!-- Đổi mật khẩu -->
+                    <button class="dropdown-item change-pwd-item" (click)="openChangePassword()">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+                            <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+                        </svg>
+                        Đổi mật khẩu
+                    </button>
+                    <div class="dropdown-divider"></div>
+                    <!-- Đăng xuất -->
+                    <button class="dropdown-item logout-item" (click)="logout()">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                             <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
                             <polyline points="16 17 21 12 16 7"></polyline>
                             <line x1="21" y1="12" x2="9" y2="12"></line>
@@ -57,3 +67,103 @@
         </div>
     </div>
 </header>
+
+<!-- Modal Đổi mật khẩu -->
+<div class="change-pwd-overlay" *ngIf="isChangePasswordOpen" (click)="closeChangePassword()">
+    <div class="change-pwd-modal" (click)="$event.stopPropagation()">
+        <!-- Header -->
+        <div class="change-pwd-header">
+            <div class="change-pwd-header-icon">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2">
+                    <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+                    <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+                </svg>
+            </div>
+            <div>
+                <h3 class="change-pwd-title">Đổi mật khẩu</h3>
+                <p class="change-pwd-subtitle">Cập nhật mật khẩu tài khoản của bạn</p>
+            </div>
+            <button class="change-pwd-close" (click)="closeChangePassword()">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <line x1="18" y1="6" x2="6" y2="18"></line>
+                    <line x1="6" y1="6" x2="18" y2="18"></line>
+                </svg>
+            </button>
+        </div>
+
+        <!-- Body -->
+        <form [formGroup]="changePasswordForm" (ngSubmit)="onChangePasswordSubmit()" class="change-pwd-body">
+            
+            <!-- Mật khẩu cũ -->
+            <div class="pwd-form-group">
+                <label class="pwd-label">Mật khẩu cũ <span class="required">*</span></label>
+                <div class="pwd-input-wrapper" [class.invalid]="changePwdSubmitted && cpg['oldPassword'].errors">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#9e9e9e" stroke-width="2">
+                        <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+                        <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+                    </svg>
+                    <input type="password" formControlName="oldPassword" class="pwd-input" placeholder="Nhập mật khẩu hiện tại" />
+                </div>
+                <div *ngIf="changePwdSubmitted && cpg['oldPassword'].errors" class="pwd-errors">
+                    <div *ngIf="cpg['oldPassword'].errors['required']">Vui lòng nhập mật khẩu cũ</div>
+                </div>
+            </div>
+
+            <!-- Mật khẩu mới -->
+            <div class="pwd-form-group">
+                <label class="pwd-label">Mật khẩu mới <span class="required">*</span></label>
+                <div class="pwd-input-wrapper" [class.invalid]="changePwdSubmitted && cpg['newPassword'].errors">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#9e9e9e" stroke-width="2">
+                        <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+                        <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+                    </svg>
+                    <input type="password" formControlName="newPassword" class="pwd-input" placeholder="VD: Abc@1234" autocomplete="new-password" />
+                </div>
+                <div *ngIf="changePwdSubmitted && cpg['newPassword'].errors" class="pwd-errors">
+                    <div *ngIf="cpg['newPassword'].errors['required']">Vui lòng nhập mật khẩu mới</div>
+                    <div *ngIf="cpg['newPassword'].errors['minlength']">Mật khẩu phải dài ít nhất 8 ký tự</div>
+                    <div *ngIf="cpg['newPassword'].errors['noUpperCase']">Thiếu chữ hoa (A-Z)</div>
+                    <div *ngIf="cpg['newPassword'].errors['noLowerCase']">Thiếu chữ thường (a-z)</div>
+                    <div *ngIf="cpg['newPassword'].errors['noNumeric']">Thiếu chữ số (0-9)</div>
+                    <div *ngIf="cpg['newPassword'].errors['noSpecial']">Thiếu ký tự đặc biệt (@$!%*?&...)</div>
+                </div>
+            </div>
+
+            <!-- Xác nhận mật khẩu -->
+            <div class="pwd-form-group">
+                <label class="pwd-label">Xác nhận mật khẩu mới <span class="required">*</span></label>
+                <div class="pwd-input-wrapper" [class.invalid]="changePwdSubmitted && cpg['confirmPassword'].errors">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#9e9e9e" stroke-width="2">
+                        <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+                        <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+                    </svg>
+                    <input type="password" formControlName="confirmPassword" class="pwd-input" placeholder="Nhập lại mật khẩu mới" autocomplete="new-password" />
+                </div>
+                <div *ngIf="changePwdSubmitted && cpg['confirmPassword'].errors" class="pwd-errors">
+                    <div *ngIf="cpg['confirmPassword'].errors['required']">Vui lòng xác nhận mật khẩu</div>
+                    <div *ngIf="cpg['confirmPassword'].errors['mustMatch']">Mật khẩu xác nhận không khớp</div>
+                </div>
+            </div>
+
+            <!-- Thông báo -->
+            <div *ngIf="changePwdError" class="pwd-alert pwd-alert-error">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
+                {{ changePwdError }}
+            </div>
+            <div *ngIf="changePwdSuccess" class="pwd-alert pwd-alert-success">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                {{ changePwdSuccess }}
+            </div>
+
+            <!-- Footer buttons -->
+            <div class="change-pwd-footer">
+                <button type="button" class="pwd-btn-cancel" (click)="closeChangePassword()" [disabled]="changePwdLoading">Hủy</button>
+                <button type="submit" class="pwd-btn-submit" [disabled]="changePwdLoading">
+                    <span *ngIf="changePwdLoading" class="pwd-spinner"></span>
+                    <span *ngIf="!changePwdLoading">Xác nhận đổi mật khẩu</span>
+                    <span *ngIf="changePwdLoading">Đang xử lý...</span>
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
