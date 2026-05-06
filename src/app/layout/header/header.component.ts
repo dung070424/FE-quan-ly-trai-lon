@@ -27,6 +27,11 @@ export class HeaderComponent {
     changePwdError = '';
     changePwdSuccess = '';
 
+    // Trạng thái hiển thị mật khẩu
+    showOldPassword = false;
+    showNewPassword = false;
+    showConfirmPassword = false;
+
     get currentUser() {
         return this.authService.currentUserValue;
     }
@@ -73,6 +78,12 @@ export class HeaderComponent {
         this.changePwdSubmitted = false;
         this.changePwdError = '';
         this.changePwdSuccess = '';
+        
+        // Reset trạng thái con mắt
+        this.showOldPassword = false;
+        this.showNewPassword = false;
+        this.showConfirmPassword = false;
+
         this.changePasswordForm = this.fb.group({
             oldPassword: ['', Validators.required],
             newPassword: ['', [Validators.required, Validators.minLength(8), this.strongPasswordValidator]],
@@ -105,20 +116,16 @@ export class HeaderComponent {
                 this.changePwdSuccess = 'Đổi mật khẩu thành công!';
                 this.changePasswordForm.reset();
                 this.changePwdSubmitted = false;
-                this.cdr.detectChanges(); // Cập nhật UI ngay lập tức
+                this.cdr.detectChanges();
                 setTimeout(() => this.closeChangePassword(), 1500);
             },
             error: (err) => {
                 this.changePwdLoading = false;
-                // Hiển thị thông báo lỗi từ Backend
                 this.changePwdError = err.error || 'Đã xảy ra lỗi. Vui lòng thử lại.';
-                
-                // Nếu lỗi là một object, thử lấy message
                 if (typeof err.error === 'object' && err.error.message) {
                     this.changePwdError = err.error.message;
                 }
-                
-                this.cdr.detectChanges(); // Ép Angular cập nhật UI để hiện lỗi và tắt spinner ngay
+                this.cdr.detectChanges();
             }
         });
     }

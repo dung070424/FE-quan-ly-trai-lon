@@ -45,6 +45,13 @@ export class LoginComponent implements OnDestroy {
   private countdownSub: Subscription | null = null;
   countdownDisplay$ = new BehaviorSubject<number>(60);
 
+  // Password visibility
+  showLoginPassword = false;
+  showResetNewPassword = false;
+  showResetConfirmPassword = false;
+  showFirstNewPassword = false;
+  showFirstConfirmPassword = false;
+
   private authService = inject(AuthService);
   private router = inject(Router);
   private route = inject(ActivatedRoute);

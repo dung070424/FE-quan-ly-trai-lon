@@ -313,6 +313,19 @@
     &::placeholder { color: #bbb; }
 }
 
+.eye-btn {
+    background: none;
+    border: none;
+    color: #9e9e9e;
+    cursor: pointer;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: color 0.2s;
+    &:hover { color: #2e7d32; }
+}
+
 .pwd-errors {
     margin-top: 6px;
     div {

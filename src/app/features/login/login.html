@@ -51,7 +51,11 @@
                         <div class="icon-left">
                             <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
                         </div>
-                        <input type="password" id="password" formControlName="password" class="form-control" placeholder="Nhập mật khẩu" autocomplete="off" />
+                        <input [type]="showLoginPassword ? 'text' : 'password'" id="password" formControlName="password" class="form-control" placeholder="Nhập mật khẩu" autocomplete="off" />
+                        <button type="button" class="eye-btn-login" (click)="showLoginPassword = !showLoginPassword" style="background: none; border: none; padding-right: 12px; color: #94a3b8; cursor: pointer;">
+                            <svg *ngIf="!showLoginPassword" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+                            <svg *ngIf="showLoginPassword" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path><line x1="1" y1="1" x2="23" y2="23"></line></svg>
+                        </button>
                     </div>
                     <div *ngIf="submitted && f['password'].errors" class="error-text">
                         <span *ngIf="f['password'].errors['required']">Vui lòng nhập mật khẩu</span>
@@ -200,7 +204,11 @@
                         <div class="icon-left">
                             <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
                         </div>
-                        <input type="password" id="newPassword" formControlName="newPassword" class="form-control" placeholder="VD: Abc@1234" />
+                        <input [type]="showResetNewPassword ? 'text' : 'password'" id="newPassword" formControlName="newPassword" class="form-control" placeholder="VD: Abc@1234" />
+                        <button type="button" class="eye-btn-login" (click)="showResetNewPassword = !showResetNewPassword" style="background: none; border: none; padding-right: 12px; color: #94a3b8; cursor: pointer;">
+                            <svg *ngIf="!showResetNewPassword" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+                            <svg *ngIf="showResetNewPassword" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path><line x1="1" y1="1" x2="23" y2="23"></line></svg>
+                        </button>
                     </div>
                     <div *ngIf="resetSubmitted && rg['newPassword'].errors" class="error-text" style="color: #d32f2f; font-size: 12px; margin-top: 4px;">
                         <div *ngIf="rg['newPassword'].errors['required']">Vui lòng nhập mật khẩu mới</div>
@@ -218,7 +226,11 @@
                         <div class="icon-left">
                             <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
                         </div>
-                        <input type="password" id="confirmPassword" formControlName="confirmPassword" class="form-control" placeholder="Xác nhận mật khẩu" />
+                        <input [type]="showResetConfirmPassword ? 'text' : 'password'" id="confirmPassword" formControlName="confirmPassword" class="form-control" placeholder="Xác nhận mật khẩu" />
+                        <button type="button" class="eye-btn-login" (click)="showResetConfirmPassword = !showResetConfirmPassword" style="background: none; border: none; padding-right: 12px; color: #94a3b8; cursor: pointer;">
+                            <svg *ngIf="!showResetConfirmPassword" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+                            <svg *ngIf="showResetConfirmPassword" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path><line x1="1" y1="1" x2="23" y2="23"></line></svg>
+                        </button>
                     </div>
                     <div *ngIf="resetSubmitted && rg['confirmPassword'].errors" class="error-text" style="color: #d32f2f; font-size: 12px; margin-top: 4px;">
                         <span *ngIf="rg['confirmPassword'].errors['required']">Vui lòng nhập lại mật khẩu</span>
@@ -272,7 +284,11 @@
                     <div class="icon-left">
                         <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
                     </div>
-                    <input type="password" id="firstLoginNewPassword" formControlName="newPassword" class="form-control" placeholder="VD: Abc@1234" autocomplete="new-password" />
+                    <input [type]="showFirstNewPassword ? 'text' : 'password'" id="firstLoginNewPassword" formControlName="newPassword" class="form-control" placeholder="VD: Abc@1234" autocomplete="new-password" />
+                    <button type="button" class="eye-btn-login" (click)="showFirstNewPassword = !showFirstNewPassword" style="background: none; border: none; padding-right: 12px; color: #94a3b8; cursor: pointer;">
+                        <svg *ngIf="!showFirstNewPassword" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+                        <svg *ngIf="showFirstNewPassword" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path><line x1="1" y1="1" x2="23" y2="23"></line></svg>
+                    </button>
                 </div>
                 <div *ngIf="firstLoginSubmitted && flg['newPassword'].errors" class="error-text" style="color: #d32f2f; font-size: 12px; margin-top: 4px;">
                     <div *ngIf="flg['newPassword'].errors['required']">Vui lòng nhập mật khẩu mới</div>
@@ -290,7 +306,11 @@
                     <div class="icon-left">
                         <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
                     </div>
-                    <input type="password" id="firstLoginConfirmPassword" formControlName="confirmPassword" class="form-control" placeholder="Xác nhận mật khẩu" autocomplete="new-password" />
+                    <input [type]="showFirstConfirmPassword ? 'text' : 'password'" id="firstLoginConfirmPassword" formControlName="confirmPassword" class="form-control" placeholder="Xác nhận mật khẩu" autocomplete="new-password" />
+                    <button type="button" class="eye-btn-login" (click)="showFirstConfirmPassword = !showFirstConfirmPassword" style="background: none; border: none; padding-right: 12px; color: #94a3b8; cursor: pointer;">
+                        <svg *ngIf="!showFirstConfirmPassword" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+                        <svg *ngIf="showFirstConfirmPassword" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path><line x1="1" y1="1" x2="23" y2="23"></line></svg>
+                    </button>
                 </div>
                 <div *ngIf="firstLoginSubmitted && flg['confirmPassword'].errors" class="error-text" style="color: #d32f2f; font-size: 12px; margin-top: 4px;">
                     <span *ngIf="flg['confirmPassword'].errors['required']">Vui lòng nhập lại mật khẩu</span>
