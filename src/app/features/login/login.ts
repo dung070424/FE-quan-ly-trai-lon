@@ -1,5 +1,5 @@
 import { Component, inject, ChangeDetectorRef, NgZone, OnDestroy } from '@angular/core';
-import { FormBuilder, FormGroup, Validators, ReactiveFormsModule, AbstractControl, ValidationErrors } from '@angular/forms';
+import { FormBuilder, FormGroup, Validators, ReactiveFormsModule, AbstractControl, ValidationErrors, FormsModule } from '@angular/forms';
 import { Router, ActivatedRoute } from '@angular/router';
 import { AuthService } from '../../core/services/auth.service';
 import { CommonModule } from '@angular/common';
@@ -8,7 +8,7 @@ import { interval, Subscription, BehaviorSubject } from 'rxjs';
 @Component({
   selector: 'app-login',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule],
+  imports: [CommonModule, ReactiveFormsModule, FormsModule],
   templateUrl: './login.html',
   styleUrls: ['./login.scss']
 })
@@ -51,6 +51,7 @@ export class LoginComponent implements OnDestroy {
   showResetConfirmPassword = false;
   showFirstNewPassword = false;
   showFirstConfirmPassword = false;
+  otpDigits: string[] = ['', '', '', '', '', ''];
 
   private authService = inject(AuthService);
   private router = inject(Router);
@@ -232,19 +233,91 @@ export class LoginComponent implements OnDestroy {
     this.cdr.detectChanges();
   }
 
-  confirmOtp() {
-    this.resetSubmitted = true;
-    if (this.rg['code'].invalid) {
+  trackByIndex(index: number, item: any) {
+    return index;
+  }
+
+  onOtpInput(event: any, index: number) {
+    const input = event.target;
+    let value = input.value;
+    
+    // If more than 1 char (e.g. typing over), take the last one
+    if (value.length > 1) {
+      value = value.charAt(value.length - 1);
+    }
+
+    // Only allow numbers
+    if (value && !/^\d$/.test(value)) {
+      input.value = '';
+      this.otpDigits[index] = '';
       return;
     }
+
+    this.otpDigits[index] = value;
+    input.value = value; // Force view sync
     
-    this.resetLoading = true;
+    // Move focus to next input with a small delay to prevent key stroke leakage
+    if (value && index < 5) {
+      setTimeout(() => {
+        const inputs = document.querySelectorAll('.otp-digit-input');
+        const nextInput = inputs[index + 1] as HTMLInputElement;
+        if (nextInput) {
+          nextInput.focus();
+          nextInput.select();
+        }
+      }, 50); // 50ms is safer for all browsers
+    }
+    
+    // Update form control value
+    this.resetPasswordForm.patchValue({
+      code: this.otpDigits.join('')
+    });
+  }
+
+  onOtpKeyDown(event: KeyboardEvent, index: number) {
+    if (event.key === 'Backspace' && !this.otpDigits[index] && index > 0) {
+      const inputs = document.querySelectorAll('.otp-digit-input-modern');
+      const prevInput = inputs[index - 1] as HTMLInputElement;
+      if (prevInput) {
+        prevInput.focus();
+      }
+    }
+  }
+
+  onOtpPaste(event: ClipboardEvent) {
+    event.preventDefault();
+    const pasteData = event.clipboardData?.getData('text');
+    if (!pasteData || !/^\d{6}$/.test(pasteData)) return;
+
+    const digits = pasteData.split('');
+    this.otpDigits = digits;
+    
+    // Update form control
+    this.resetPasswordForm.patchValue({
+      code: pasteData
+    });
+
+    // Focus last input
+    const inputs = document.querySelectorAll('.otp-digit-input-modern');
+    if (inputs.length > 0) {
+      (inputs[5] as HTMLElement).focus();
+    }
+  }
+
+  confirmOtp() {
+    this.resetSubmitted = true;
     this.resetError = '';
+    const code = this.otpDigits.join('');
     
-    const username = this.forgotForm.value.username;
-    const resetCode = this.resetPasswordForm.value.code;
-    
-    this.authService.verifyResetCode({ username, resetCode }).subscribe({
+    if (code.length !== 6) {
+      this.resetError = 'Vui lòng nhập đủ 6 chữ số OTP.';
+      return;
+    }
+
+    this.resetLoading = true;
+    const username = this.fg['username'].value;
+
+    this.authService.verifyResetCode({ username, resetCode: code }).subscribe({
       next: () => {
         this.resetLoading = false;
         this.resetSubmitted = false;
@@ -253,10 +326,10 @@ export class LoginComponent implements OnDestroy {
       },
       error: (err) => {
         this.resetLoading = false;
-        if (err.status === 404) {
-          this.resetError = 'Lỗi kết nối Server. Vui lòng restart lại Backend (Java).';
+        if (err.status === 400 || err.status === 404) {
+          this.resetError = err.error || 'Mã xác thực không chính xác hoặc đã hết hạn.';
         } else {
-          this.resetError = 'Mã xác nhận không chính xác hoặc đã hết hạn.';
+          this.resetError = 'Đã xảy ra lỗi khi xác thực mã. Vui lòng thử lại.';
         }
         this.cdr.detectChanges();
       }
@@ -267,13 +340,15 @@ export class LoginComponent implements OnDestroy {
     this.otpConfirmed = false;
     this.resetSubmitted = false;
     this.resetError = '';
+    this.cdr.detectChanges();
   }
 
   resendOtp() {
     this.resetSubmitted = false;
     this.resetError = '';
     this.forgotSuccess = '';
-    this.resetPasswordForm.reset();
+    this.otpDigits = ['', '', '', '', '', ''];
+    this.resetPasswordForm.patchValue({ code: '' });
 
     // Gửi lại OTP bằng username/email đã nhập từ bước 1
     const username = this.fg['username'].value;
@@ -310,13 +385,13 @@ export class LoginComponent implements OnDestroy {
     this.resetLoading = true;
     this.authService.resetPassword({
       username: this.fg['username'].value,
-      resetCode: this.rg['code'].value,
+      resetCode: this.otpDigits.join(''),
       newPassword: this.rg['newPassword'].value
     }).subscribe({
       next: (response) => {
         this.resetLoading = false;
-        this.closeForgotModal();
-        alert("Đặt lại mật khẩu thành công! Bạn có thể đăng nhập bằng mật khẩu mới.");
+        this.forgotPasswordStep = 3; // Show success screen
+        this.cdr.detectChanges();
       },
       error: (err) => {
         this.resetLoading = false;
